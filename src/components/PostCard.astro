@@ -1,0 +1,11 @@
+---
+import { excerpt } from '../lib/posts';
+import { withBase } from '../lib/url';
+const { post } = Astro.props;
+const href = withBase(`posts/${post.data.entryId}`);
+---
+<article class="post-card">
+  <p class="eyebrow">{post.data.date_published}</p>
+  <h2 class="post-card__title"><a href={href}>{post.data.title}</a></h2>
+  <p class="excerpt">{excerpt(post.body ?? '')}</p>
+</article>
