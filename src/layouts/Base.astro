@@ -1,0 +1,26 @@
+---
+import '@fontsource-variable/frank-ruhl-libre';
+import '@fontsource-variable/assistant';
+import '../styles/global.css';
+import { withBase } from '../lib/url';
+const { title, description } = Astro.props;
+---
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+  </head>
+  <body>
+    <header class="site-header">
+      <a href={withBase('/')} style="text-decoration:none;color:inherit"><h1>חיה בסרט(ן)</h1></a>
+      <p>הסרט שלי השנה: סרטן השד. האמונה שלי: השד לא נורא כל כך</p>
+    </header>
+    <main class="wrap"><slot /></main>
+    <footer class="site-footer">
+      ארכיון הבלוג של shahf11 · <a href={withBase('about')}>על הבלוג</a> · <a href="https://github.com/yonatankarp/shahf11-blog">GitHub</a>
+    </footer>
+  </body>
+</html>

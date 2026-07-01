@@ -1,0 +1,11 @@
+---
+import { excerpt } from '../lib/posts';
+import { withBase } from '../lib/url';
+const { post } = Astro.props;
+const href = withBase(`posts/${post.data.entryId}`);
+---
+<article style="padding-block:1.5rem;border-block-end:1px solid var(--rule)">
+  <h2 style="margin:0 0 .25rem"><a href={href} style="text-decoration:none">{post.data.title}</a></h2>
+  <p style="font-family:var(--sans);color:var(--muted);font-size:.85rem;margin:0 0 .5rem">{post.data.date_published}</p>
+  <p style="margin:0">{excerpt(post.body ?? '')}</p>
+</article>

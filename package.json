@@ -1,0 +1,19 @@
+{
+  "name": "shahf11-blog",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "copy:images": "node scripts/copy-images.mjs",
+    "dev": "npm run copy:images && astro dev",
+    "build": "npm run copy:images && astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "astro": "^5.0.0",
+    "@fontsource-variable/frank-ruhl-libre": "^5.0.0",
+    "@fontsource-variable/assistant": "^5.0.0",
+    "unist-util-visit": "^5.0.0"
+  }
+}

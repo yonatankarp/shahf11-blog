@@ -1,0 +1,43 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { getAllPosts, getAdjacent } from '../../lib/posts';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  return posts.map((post) => ({ params: { entryId: post.data.entryId }, props: { post } }));
+}
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { newer, older } = await getAdjacent(post.data.entryId);
+const pdf = `https://github.com/yonatankarp/shahf11-blog/raw/main/posts-pdf/${post.id}.pdf`;
+const truncated = post.data.review.includes('scan-truncated');
+// frontmatter images not already shown inline in the body
+const inlineImgs = (post.body ?? '').match(/images\/[^\s)]+/g) ?? [];
+const extraImgs = post.data.images.filter((f) => !inlineImgs.some((s) => s.endsWith(f)));
+---
+<Base title={post.data.title}>
+  <article>
+    <h1>{post.data.title}</h1>
+    <p style="font-family:var(--sans);color:var(--muted);font-size:.9rem">{post.data.date_published}</p>
+    {truncated && (
+      <p style="font-family:var(--sans);font-size:.85rem;background:#f3ead9;border-inline-start:3px solid var(--accent);padding:.6rem .8rem">
+        הערה: הסריקה של רשומה זו חתוכה בשוליים וחלק מהטקסט חסר. התמלול הוא כמיטב היכולת; ראו את הסריקה המקורית.
+      </p>
+    )}
+    <Content />
+    {extraImgs.length > 0 && (
+      <section style="margin-block-start:2rem">
+        {extraImgs.map((f) => <img src={withBase(`images/${f}`)} alt="" loading="lazy" />)}
+      </section>
+    )}
+    <p style="font-family:var(--sans);font-size:.9rem;margin-block-start:2rem">
+      <a href={pdf}>הורדת הסריקה המקורית (PDF)</a>
+    </p>
+    <nav style="display:flex;justify-content:space-between;font-family:var(--sans);border-block-start:1px solid var(--rule);padding-block:1.5rem;margin-block-start:2rem">
+      {older ? <a href={withBase(`posts/${older.data.entryId}`)}>← {older.data.title}</a> : <span />}
+      {newer ? <a href={withBase(`posts/${newer.data.entryId}`)}>{newer.data.title} →</a> : <span />}
+    </nav>
+  </article>
+</Base>
