@@ -1,0 +1,18 @@
+{
+  "title": "חיה בסרט(ן) - סרט גמר יא'",
+  "description_en": "Graduation film (11th grade). Preserved memorial video.",
+  "file": "graduation-film-2009.mp4",
+  "source_url": "https://www.youtube.com/watch?v=LoYL4GlxybU",
+  "source_platform": "YouTube",
+  "uploader": "shahf11",
+  "upload_date": "2009-06-20",
+  "resolution": "720x480",
+  "duration_seconds": 521.9,
+  "video_codec": "h264",
+  "audio_codec": "aac",
+  "container": "mp4",
+  "filesize_bytes": 35726473,
+  "sha256": "bcdf923e680103794444cda58215c7408e6a2eb77506edb84ac81f5027400108",
+  "preserved_on": "2026-07-01",
+  "note": "Downloaded from YouTube and committed to the repository so the video survives if the source is ever removed. 720x480 is the maximum quality available from the source. This file is both the preserved original and the web-playable copy."
+}
