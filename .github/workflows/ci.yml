@@ -1,16 +1,47 @@
-name: CI
+name: Site CI
 
 on:
   pull_request:
+    branches:
+      - main
+  push:
+    branches-ignore:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   build:
+    name: Build Astro site
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
-      - run: npm ci
-      - run: npm run build
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  dependabot_auto_merge:
+    needs: build
+    if: ${{ github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' }}
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: yonatankarp/github-actions/.github/workflows/dependabot-auto-merge.yml@v2
+    secrets:
+      GITHUB_PAT: ${{ secrets.REVIEWER_GITHUB_TOKEN }}
