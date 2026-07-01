@@ -13,29 +13,26 @@ const { Content } = await render(post);
 const { newer, older } = await getAdjacent(post.data.entryId);
 const pdf = `https://github.com/yonatankarp/shahf11-blog/raw/main/posts-pdf/${post.id}.pdf`;
 const truncated = post.data.review.includes('scan-truncated');
-// frontmatter images not already shown inline in the body
 const inlineImgs = (post.body ?? '').match(/images\/[^\s)]+/g) ?? [];
 const extraImgs = post.data.images.filter((f) => !inlineImgs.some((s) => s.endsWith(f)));
 ---
 <Base title={post.data.title}>
-  <article>
-    <h1>{post.data.title}</h1>
-    <p style="font-family:var(--sans);color:var(--muted);font-size:.9rem">{post.data.date_published}</p>
+  <article class="post">
+    <p class="eyebrow">{post.data.date_published}</p>
+    <h1 class="post__title">{post.data.title}</h1>
     {truncated && (
-      <p style="font-family:var(--sans);font-size:.85rem;background:#f3ead9;border-inline-start:3px solid var(--accent);padding:.6rem .8rem">
+      <p class="post__note">
         הערה: הסריקה של רשומה זו חתוכה בשוליים וחלק מהטקסט חסר. התמלול הוא כמיטב היכולת; ראו את הסריקה המקורית.
       </p>
     )}
-    <Content />
+    <div class="post__body"><Content /></div>
     {extraImgs.length > 0 && (
-      <section style="margin-block-start:2rem">
+      <section class="gallery">
         {extraImgs.map((f) => <img src={withBase(`images/${f}`)} alt="" loading="lazy" />)}
       </section>
     )}
-    <p style="font-family:var(--sans);font-size:.9rem;margin-block-start:2rem">
-      <a href={pdf}>הורדת הסריקה המקורית (PDF)</a>
-    </p>
-    <nav style="display:flex;justify-content:space-between;font-family:var(--sans);border-block-start:1px solid var(--rule);padding-block:1.5rem;margin-block-start:2rem">
+    <p class="post__pdf"><a href={pdf}>הורדת הסריקה המקורית (PDF)</a></p>
+    <nav class="post-nav">
       {older ? <a href={withBase(`posts/${older.data.entryId}`)}>← {older.data.title}</a> : <span />}
       {newer ? <a href={withBase(`posts/${newer.data.entryId}`)}>{newer.data.title} →</a> : <span />}
     </nav>

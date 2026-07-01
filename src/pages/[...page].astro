@@ -10,8 +10,10 @@ export async function getStaticPaths({ paginate }) {
 const { page } = Astro.props;
 ---
 <Base title="חיה בסרט(ן) — ארכיון">
-  {page.data.map((post) => <PostCard post={post} />)}
-  <nav style="display:flex;justify-content:space-between;font-family:var(--sans);padding-block:2rem">
+  <div class="feed">
+    {page.data.map((post) => <PostCard post={post} />)}
+  </div>
+  <nav class="pagination">
     {page.url.next ? <a href={page.url.next}>← ישנים יותר</a> : <span />}
     {page.url.prev ? <a href={page.url.prev}>חדשים יותר →</a> : <span />}
   </nav>

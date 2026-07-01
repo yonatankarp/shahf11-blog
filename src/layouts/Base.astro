@@ -15,9 +15,10 @@ const { title, description } = Astro.props;
   </head>
   <body>
     <header class="site-header">
-      <a href={withBase('/')} style="text-decoration:none;color:inherit"><h1>חיה בסרט(ן)</h1></a>
-      <p>הסרט שלי השנה: סרטן השד. האמונה שלי: השד לא נורא כל כך</p>
+      <a class="site-header__link" href={withBase('/')}><h1 class="site-header__title">חיה בסרט(ן)</h1></a>
+      <p class="site-header__tagline">הסרט שלי השנה: סרטן השד. האמונה שלי: השד לא נורא כל כך</p>
     </header>
+    <hr class="masthead-rule" />
     <main class="wrap"><slot /></main>
     <footer class="site-footer">
       ארכיון הבלוג של shahf11 · <a href={withBase('about')}>על הבלוג</a> · <a href="https://github.com/yonatankarp/shahf11-blog">GitHub</a>
