@@ -4,7 +4,7 @@ Source: 23 scanned PDFs in `blog/` (blog **חיה בסרט(ן)** / shahf11, tapu
 
 Each single-sided printout was scanned double-sided, so roughly every other scan page is a blank back (mostly the even pages, but the alternation shifts in some files). Blank pages were detected by ink density, not by page parity, and are excluded. Posts were segmented using the "Page X of Y" header and the repeated post-header block, and chained across files by `EntryId`.
 
-**182 posts** across **291 content pages** (85 posts span more than one page). Dates are OCR best-effort (Hebrew, bidi-scrambled) and approximate.
+**182 posts** across **294 content pages** (88 posts span more than one page). Dates are OCR best-effort (Hebrew, bidi-scrambled) and approximate.
 
 **Scanning anomalies handled:**
 
@@ -12,20 +12,17 @@ Each single-sided printout was scanned double-sided, so roughly every other scan
 - Post **1257386** was scanned out of order: its page 1 is at scan (4).pdf **p57** and its page 2 at **p51** (with an unrelated post in between). They are merged here in reading order.
 - Posts that were split across several single-sheet scan files are merged by EntryId: **1280359** spans scan (8)-(11), **1337229** spans scan (14)-(20).
 
-**Posts needing re-scan (12)** — verified by eye: the last scanned page runs off the bottom mid-text with no closing footer, so a content page is missing. Their per-post PDFs are incomplete.
+**Posts needing re-scan (9)** — verified by eye: the last scanned page runs off the bottom mid-text with no closing footer, so a content page is missing. Their per-post PDFs are incomplete. Three of the original twelve (1257967, 1260454, 1288875) were re-scanned in 2026 and are now complete and archived.
 
 | # | EntryId | In scan | Missing |
 |---:|---|---|---|
 | 61 | 1253887 | scan (4).pdf p31 | page 2 of 2 missing |
 | 66 | 1256139 | scan (4).pdf p47 | page 2 of 2 missing |
-| 68 | 1257967 | scan (4).pdf p53 | page 2 of 2 missing |
 | 71 | 1259556 | scan (4).pdf p63 | page 2 of 2 missing |
-| 72 | 1260454 | scan (4).pdf p65 | page 2 of 2 missing |
 | 85 | 1272964 | scan (5).pdf p45-47 | page 3 of 3 missing |
 | 106 | 1281576 | scan (12).pdf p3 | page 2 of 2 missing (body may be complete; nav page absent) |
 | 109 | 1283048 | scan (12).pdf p11 | page 2 of 2 missing |
 | 115 | 1286965 | scan (12).pdf p29 | page 2 of 2 missing |
-| 118 | 1288875 | scan (12).pdf p39 | page 2 of 2 missing |
 | 148 | 1344033 | scan (21).pdf p31 | page 2 of 2 missing |
 | 151 | 1346069 | scan (21).pdf p43 | page 2 of 2 missing |
 
@@ -98,11 +95,11 @@ Each single-sided printout was scanned double-sided, so roughly every other scan
 | 65 | יוני 2008 2:36 | 1255517 | 2 | scan (4).pdf p43-45 |  |
 | 66 | יוני 2008 2:86 | 1256139 | 1 | scan (4).pdf p47 | NEEDS RE-SCAN — page 2 of 2 missing |
 | 67 | יוני 2008 2:35 | 1256878 | 1 | scan (4).pdf p49 |  |
-| 68 | יוני 2008 2:95 | 1257967 | 1 | scan (4).pdf p53 | NEEDS RE-SCAN — page 2 of 2 missing |
+| 68 | יוני 2008 2:95 | 1257967 | 2 | rescan-1257967.pdf p1, p3 | re-scanned 2026 |
 | 69 | יוני 2008 2:85 | 1257386 | 2 | scan (4).pdf p57, p51 | pages scanned out of order |
 | 70 | יוני 2008 2:35 | 1259103 | 2 | scan (4).pdf p59-61 |  |
 | 71 | יוני 2008 2:84 | 1259556 | 1 | scan (4).pdf p63 | NEEDS RE-SCAN — page 2 of 2 missing |
-| 72 | יוני 2008 2:83 | 1260454 | 1 | scan (4).pdf p65 | NEEDS RE-SCAN — page 2 of 2 missing |
+| 72 | יוני 2008 2:83 | 1260454 | 2 | rescan-1260454.pdf p1, p3 | re-scanned 2026 |
 | 73 | יוני 2008 2:83 | 1261172 | 1 | scan (4).pdf p69 | marker says 2p, 1 present in scan |
 | 74 | יוני 2008 2:33 | 1261776 | 2 | scan (4).pdf p71-73 |  |
 | 75 | יוני 2008 2:88 | 1262108 | 1 | scan (4).pdf p75 |  |
@@ -148,7 +145,7 @@ Each single-sided printout was scanned double-sided, so roughly every other scan
 | 115 | יולי 2008 0:49 | 1286965 | 1 | scan (12).pdf p29 | NEEDS RE-SCAN — page 2 of 2 missing |
 | 116 | יולי 2008 0:51 | 1287705 | 2 | scan (12).pdf p31-33 |  |
 | 117 | יולי 2008 0:59 | 1288253 | 2 | scan (12).pdf p35-37 |  |
-| 118 | יולי 2008 | 1288875 | 1 | scan (12).pdf p39 | NEEDS RE-SCAN — page 2 of 2 missing |
+| 118 | יולי 2008 | 1288875 | 2 | rescan-1288875.pdf p1, p3 | re-scanned 2026 |
 | 119 | יולי 2008 17:38 | 1289773 | 1 | scan (13).pdf p3 |  |
 | 120 | יולי 2008 | 1290139 | 2 | scan (13).pdf p5-7 |  |
 | 121 | יולי 2008 | 1290812 | 2 | scan (13).pdf p9-11 |  |
