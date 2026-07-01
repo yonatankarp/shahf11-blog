@@ -52,7 +52,7 @@ Each single-sided printout was scanned double-sided, so roughly every other scan
 | 19 | מאי 2008 6:51 | 1229167 | 2 | scan (1).pdf p39-41 |  |
 | 20 | מאי 2008 6:51 | 1230149 | 1 | scan (1).pdf p43 |  |
 | 21 | מאי 2008 6:51 | 1230834 | 2 | scan (1).pdf p45-47 |  |
-| 22 | מאי 2008 6:52 | — | 1 | scan (1).pdf p49 |  |
+| 22 | מאי 2008 6:52 | 1231387 | 1 | scan (1).pdf p49 |  |
 | 23 | מאי 2008 6:52 | 1231927 | 2 | scan (1).pdf p51-53 |  |
 | 24 | מאי 2008 6:52 | 1232342 | 1 | scan (1).pdf p55 |  |
 | 25 | מאי 2008 6:52 | 1232576 | 2 | scan (1).pdf p57-59 |  |
@@ -107,16 +107,16 @@ Each single-sided printout was scanned double-sided, so roughly every other scan
 | 74 | יוני 2008 2:33 | 1261776 | 2 | scan (4).pdf p71-73 |  |
 | 75 | יוני 2008 2:88 | 1262108 | 1 | scan (4).pdf p75 |  |
 | 76 | יוני 2008 2:82 | 1262845 | 1 | scan (4).pdf p77 |  |
-| 77 | יוני 2008 2:82 | 126791 | 2 | scan (4).pdf p79-81 |  |
+| 77 | יוני 2008 2:82 | 1267911 | 2 | scan (4).pdf p79-81 |  |
 | 78 | יוני 2008 2:29 | 1268670 | 1 | scan (4).pdf p83 | marker says 2p, 1 present in scan |
 | 79 | יוני 2008 3:21 | 1268998 | 17 | scan (5).pdf p1-33 |  |
 | 80 | יוני 2008 3:24 | 1269220 | 1 | scan (5).pdf p35 | marker says 2p, 1 present in scan |
 | 81 | יוני 2008 3:25 | 1269668 | 1 | scan (5).pdf p37 |  |
 | 82 | יוני 2008 3:25 | 1270292 | 1 | scan (5).pdf p39 | marker says 2p, 1 present in scan |
 | 83 | יוני 2008 3:25 | 1271606 | 1 | scan (5).pdf p41 | marker says 2p, 1 present in scan |
-| 84 | יוני 2008 3:26 | 12723 | 1 | scan (5).pdf p43 |  |
+| 84 | יוני 2008 3:26 | 1272390 | 1 | scan (5).pdf p43 |  |
 | 85 | יוני 2008 3:26 | 1272964 | 2 | scan (5).pdf p45-47 | NEEDS RE-SCAN — page 3 of 3 missing |
-| 86 | יוני 2008 3:27 | 12735 | 1 | scan (5).pdf p49 |  |
+| 86 | יוני 2008 3:27 | 1273501 | 1 | scan (5).pdf p49 |  |
 | 87 | יוני 2008 3:27 | 1273805 | 2 | scan (5).pdf p51-53 |  |
 | 88 | יוני 2008 3:27 | 1274320 | 2 | scan (5).pdf p55-57 |  |
 | 89 | יוני 2008 3:28 | 1274606 | 1 | scan (5).pdf p59 | marker says 2p, 1 present in scan |
@@ -131,13 +131,13 @@ Each single-sided printout was scanned double-sided, so roughly every other scan
 | 98 | יוני 2008 3:31 | 1279976 | 2 | scan (5).pdf p91-93 |  |
 | 99 | יוני 2009 4:34 | 1471005 | 1 | scan (5).pdf p95 |  |
 | 100 | יוני 2009 11:27 | 1471713 | 1 | scan (5).pdf p97 |  |
-| 101 | יוני 2009 11:29 | 14735 | 1 | scan (5).pdf p99 |  |
+| 101 | יוני 2009 11:29 | 1473516 | 1 | scan (5).pdf p99 |  |
 | 102 | יוני 2009 11:31 | 1475283 | 1 | scan (6).pdf p1 |  |
 | 103 | יוני 2009 11:30 | 1474657 | 1 | scan (7).pdf p1 |  |
 | 104 | יולי 2008 | 1280359 | 4 | scan (8).pdf p1; scan (9).pdf p1; scan (10).pdf p1; scan (11).pdf p1 |  |
 | 105 | יולי 2008 4:10 | 1280890 | 1 | scan (12).pdf p1 |  |
 | 106 | יולי 2008 4:10 | 1281576 | 1 | scan (12).pdf p3 | NEEDS RE-SCAN — page 2 of 2 missing (body may be complete; nav page absent) |
-| 107 | יולי 2008 4:11 | 128227 | 1 | scan (12).pdf p5 |  |
+| 107 | יולי 2008 4:11 | 1282271 | 1 | scan (12).pdf p5 |  |
 | 108 | יולי 2008 4:11 | 1282782 | 2 | scan (12).pdf p7-9 |  |
 | 109 | יולי 2008 4:12 | 1283048 | 1 | scan (12).pdf p11 | NEEDS RE-SCAN — page 2 of 2 missing |
 | 110 | יולי 2008 4:12 | 1283970 | 1 | scan (12).pdf p13 | marker says 2p, 1 present in scan |
@@ -162,11 +162,11 @@ Each single-sided printout was scanned double-sided, so roughly every other scan
 | 129 | יולי 2008 19:58 | 1294904 | 1 | scan (13).pdf p35 |  |
 | 130 | יולי 2008 19:59 | 1295378 | 1 | scan (13).pdf p37 |  |
 | 131 | יולי 2008 22:48 | 1295806 | 2 | scan (13).pdf p39-41 |  |
-| 132 | יולי 2008 18:26 | 12963 | 2 | scan (13).pdf p43-45 |  |
-| 133 | יולי 2008 18:37 | 12971 | 1 | scan (13).pdf p47 |  |
+| 132 | יולי 2008 18:26 | 1296314 | 2 | scan (13).pdf p43-45 |  |
+| 133 | יולי 2008 18:37 | 1297113 | 1 | scan (13).pdf p47 |  |
 | 134 | יולי 2008 20:11 | 1297586 | 2 | scan (13).pdf p49-51 |  |
 | 135 | יולי 2008 20:18 | 1298034 | 2 | scan (13).pdf p53-55 |  |
-| 136 | יולי 2008 20:19 | 129878 | 2 | scan (13).pdf p57-59 |  |
+| 136 | יולי 2008 20:19 | 1298781 | 2 | scan (13).pdf p57-59 |  |
 | 137 | פברואר 2009 2:47 | 1337229 | 7 | scan (14).pdf p1; scan (15).pdf p1; scan (16).pdf p1; scan (17).pdf p1; scan (18).pdf p1; scan (19).pdf p1; scan (20).pdf p1 |  |
 | 138 | פברואר 2009 2:48 | 1337811 | 1 | scan (21).pdf p1 |  |
 | 139 | פברואר 2009 2:49 | 1338807 | 1 | scan (21).pdf p3 |  |

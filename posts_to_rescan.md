@@ -26,3 +26,11 @@ Note: the losses cluster, which may help locate the missing sheets — five cons
 May posts print together in scan (4), four July posts in scan (12).
 
 Dates and titles are OCR-read from the scans; spot-check against the originals before relying on them.
+
+## Other scan defects (in repo, but imperfect)
+
+These are present in the archive but the scan itself is damaged, so the text is incomplete:
+
+| Publish date | Title | EntryId | Defect |
+|---|---|---|---|
+| 2008-06-29 | פרי הגפן... | 1280359 | Left margin cut off on every page (post spans scan (8)–(11)); body line-starts are missing. Best-effort transcription; flagged `scan-truncated`. Re-scan to recover. |
