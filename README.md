@@ -1,4 +1,4 @@
-# שהf11 — חיה בסרט(ן)
+# shahf11 — חיה בסרט(ן)
 
 Archive of the Hebrew blog **חיה בסרט(ן)** by *shahf11*, originally published on tapuz.co.il
 (2008–2009). The title is a pun: *חיה בסרט* ("living in a movie") with *סרטן* ("cancer") folded
