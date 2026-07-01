@@ -15,7 +15,7 @@ posts-pdf/       Per-post scanned PDF, one file per post. Downloadable original 
 images/          Photos embedded in posts, deskewed. Referenced from each post's frontmatter.
 index.csv        Machine-readable index of all posts (order, EntryId, date, source location).
 index.md         Human-readable index and scanning notes.
-posts_to_rescan.md  12 posts missing a scanned page; excluded here until re-scanned.
+posts_to_rescan.md  9 posts still missing a scanned page; excluded here until re-scanned.
 ```
 
 ## Frontmatter
@@ -43,5 +43,5 @@ with a vision model for accuracy. Dates and text may still contain OCR errors, s
 scanned PDF in `posts-pdf/` as the authoritative source when in doubt. Posts flagged in
 `review` need a manual pass.
 
-182 posts exist in total. 170 are archived here. 12 are missing a scanned page and are listed
+182 posts exist in total. 173 are archived here. 9 are missing a scanned page and are listed
 in `posts_to_rescan.md` for re-scanning.
