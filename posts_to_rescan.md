@@ -28,9 +28,11 @@ scan drops blank backs — so the "Page X of Y" counter's Y includes the nav pag
 
 Three others (1257967, 1260454, 1288875) were physically re-scanned in 2026 and archived.
 
-## Still open — margin truncation (1 post)
+## Known incomplete, not recoverable (1 post)
 
 Post EntryId **1280359** ("פרי הגפן...", 29 June 2008, file `104_EID1280359.md`) is not missing a
-page. All 4 pages scanned, but the **left margin is cut off**, so several line-starts are absent and
-the body has small gaps. It needs a re-scan of the same pages with the full margin, not a missing
-sheet. Flagged `review: ["scan-truncated"]` in the post.
+page. All 4 pages were scanned, but the **source printout itself was clipped on the left margin**, so
+the start of several lines is physically absent from the page. A re-scan cannot fix this: the missing
+text is not on the paper. The archived body is a best-effort transcription of what is legible, and it
+is the final version. The only possible path to the clipped line-starts would be an online copy of the
+original post (for example a web archive). Flagged `review: ["scan-truncated"]` in the post.
