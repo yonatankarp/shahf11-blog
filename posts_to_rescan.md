@@ -25,3 +25,10 @@ Note: the losses cluster, which may help locate the remaining sheets — three M
 print together in scan (4), three July posts in scan (12).
 
 Dates and titles are OCR-read from the scans; spot-check against the originals before relying on them.
+
+## Different loss type: margin truncation (1 post)
+
+Post EntryId **1280359** ("פרי הגפן...", 29 June 2008, file `104_EID1280359.md`) is not missing a
+page. All 4 pages scanned, but the **left margin is cut off**, so several line-starts are absent and
+the body has small gaps. It needs a re-scan of the same pages with the full margin, not a missing
+sheet. Flagged `review: ["scan-truncated"]` in the post.
