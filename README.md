@@ -13,6 +13,7 @@ blog can be rebuilt as a website, while keeping the scanned PDFs as downloadable
 content/         Markdown page per post (YAML frontmatter + body). The future website pages.
 posts-pdf/       Per-post scanned PDF, one file per post. Downloadable original source.
 images/          Photos embedded in posts, deskewed. Referenced from each post's frontmatter.
+gallery/         Standalone gallery of photos of חיה (photos/ + photos.yaml manifest). See gallery/README.md.
 index.csv        Machine-readable index of all posts (order, EntryId, date, source location).
 index.md         Human-readable index and scanning notes.
 posts_to_rescan.md  9 posts still missing a scanned page; excluded here until re-scanned.

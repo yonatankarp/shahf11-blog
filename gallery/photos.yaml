@@ -1,0 +1,24 @@
+# Photo gallery manifest for חיה בסרט(ן)
+#
+# One entry per photo. Photos themselves go in gallery/photos/.
+# This file is the data; how it is laid out visually is decided later
+# with the site design (Phase 2). Nothing here renders yet.
+#
+# Fields per photo:
+#   file:    (required) filename inside gallery/photos/, e.g. "chaya-beach-1998.jpg"
+#   caption: (optional) Hebrew caption shown with the photo
+#   date:    (optional) when the photo was taken; a year "1998" or full date "1998-07-01" both fine
+#   credit:  (optional) who took it or where it came from
+#   alt:     (optional) short description for screen readers; defaults to caption if omitted
+#
+# Display order follows the order of this list, so arrange entries as you want them shown.
+#
+# Example (remove the leading '#' and fill in real values when photos arrive):
+# photos:
+#   - file: chaya-graduation-1985.jpg
+#     caption: "חיה ביום סיום התיכון"
+#     date: "1985"
+#     credit: "אלבום המשפחה"
+#     alt: "חיה מחייכת בגלימת סיום"
+
+photos: []
