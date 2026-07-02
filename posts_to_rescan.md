@@ -28,11 +28,10 @@ scan drops blank backs — so the "Page X of Y" counter's Y includes the nav pag
 
 Three others (1257967, 1260454, 1288875) were physically re-scanned in 2026 and archived.
 
-## Known incomplete, not recoverable (1 post)
+## Resolved: post 104 recovered from a web archive
 
-Post EntryId **1280359** ("פרי הגפן...", 29 June 2008, file `104_EID1280359.md`) is not missing a
-page. All 4 pages were scanned, but the **source printout itself was clipped on the left margin**, so
-the start of several lines is physically absent from the page. A re-scan cannot fix this: the missing
-text is not on the paper. The archived body is a best-effort transcription of what is legible, and it
-is the final version. The only possible path to the clipped line-starts would be an online copy of the
-original post (for example a web archive). Flagged `review: ["scan-truncated"]` in the post.
+Post EntryId **1280359** ("בורא פרי הגפן...", 29 June 2008, file `104_EID1280359.md`) had its left
+margin clipped in the printout scan, which dropped several line-starts and the title's leading word
+בורא. The full original text was recovered in 2026 from a 2019 web-archive snapshot of the Tapuz post
+(`web.archive.org/web/20190818094647/http://www.tapuz.co.il/blogs/viewentry/1280359`) and now replaces
+the clipped transcription. Nothing remains to re-scan; all 182 posts are complete.

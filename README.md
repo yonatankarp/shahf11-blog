@@ -16,7 +16,7 @@ images/          Photos embedded in posts, deskewed. Referenced from each post's
 gallery/         Standalone gallery of photos of חיה (photos/ + photos.yaml manifest). See gallery/README.md.
 index.csv        Machine-readable index of all posts (order, EntryId, date, source location).
 index.md         Human-readable index and scanning notes.
-posts_to_rescan.md  The 9 "missing-page" posts were recovered (only the nav page was absent, not body). One post, 1280359, stays incomplete because its source printout was clipped on the left margin (not recoverable from a re-scan).
+posts_to_rescan.md  Re-scan history. The 9 "missing-page" posts were recovered from the scans (only the nav page was absent), and 1280359 (left margin clipped) was recovered from a web archive. Nothing outstanding.
 ```
 
 ## Frontmatter
@@ -46,6 +46,6 @@ scanned PDF in `posts-pdf/` as the authoritative source when in doubt. Posts fla
 
 All 182 posts are archived here. (An earlier count held back 9 posts as "missing a page";
 on review the absent page was in each case the trailing navigation page, not body text, so
-they were recovered from the scans and added.) One archived post, 1280359, stays incomplete:
-its source printout was clipped on the left margin, so some line-starts are absent and cannot be
-recovered from a re-scan. See `posts_to_rescan.md`.
+they were recovered from the scans and added.) One post, 1280359, had its left margin clipped in
+the printout scan; its full text was recovered from a 2019 web-archive snapshot of the original
+Tapuz post. See `posts_to_rescan.md`.
