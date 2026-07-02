@@ -16,7 +16,7 @@ images/          Photos embedded in posts, deskewed. Referenced from each post's
 gallery/         Standalone gallery of photos of חיה (photos/ + photos.yaml manifest). See gallery/README.md.
 index.csv        Machine-readable index of all posts (order, EntryId, date, source location).
 index.md         Human-readable index and scanning notes.
-posts_to_rescan.md  Re-scan tracker. The 9 "missing-page" posts were recovered (nav page, not body, was absent); only 1280359 (margin cut off) still needs a physical re-scan.
+posts_to_rescan.md  The 9 "missing-page" posts were recovered (only the nav page was absent, not body). One post, 1280359, stays incomplete because its source printout was clipped on the left margin (not recoverable from a re-scan).
 ```
 
 ## Frontmatter
@@ -46,5 +46,6 @@ scanned PDF in `posts-pdf/` as the authoritative source when in doubt. Posts fla
 
 All 182 posts are archived here. (An earlier count held back 9 posts as "missing a page";
 on review the absent page was in each case the trailing navigation page, not body text, so
-they were recovered from the scans and added.) One archived post, 1280359, still needs a
-physical re-scan because its left margin was cut off — see `posts_to_rescan.md`.
+they were recovered from the scans and added.) One archived post, 1280359, stays incomplete:
+its source printout was clipped on the left margin, so some line-starts are absent and cannot be
+recovered from a re-scan. See `posts_to_rescan.md`.
