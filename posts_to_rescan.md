@@ -1,32 +1,34 @@
-# Posts to re-scan (9)
+# Re-scan tracker
 
-These posts are missing a content page in the scans. In each case the last scanned
-page runs off the bottom mid-text with no closing footer, so a page is absent. Dates
-below are the post **publish date** (the "פורסם ב…" line), which is what identifies the
-original printout — not the print date stamped in the page footer.
+## Resolved: the 9 "missing-page" posts (recovered 2026)
 
-Ordered by publish date.
+These 9 posts were previously listed here as missing a content page, on the assumption that
+a scan ending mid-page with no closing footer meant lost body text. Reviewed against the
+original scans in 2026, that was wrong: in every case the only absent page was the trailing
+Tapuz **navigation/comments page**, which is excluded for every post in this archive anyway.
+The body text is complete. All 9 were extracted from the original scans, transcribed, and
+archived (frontmatter carries `title_source: vision`; bodies are vision-read, so the scanned
+PDF stays authoritative for any doubtful word).
 
-| Publish date | Date (he) | Title | EntryId | In scan now | Missing |
-|---|---|---|---|---|---|
-| 2008-05-21 | 21 במאי 2008, 19:33 | מי פה המבוגר האחראי? | 1253887 | scan (4).pdf p31 | page 2 of 2 |
-| 2008-05-25 | 25 במאי 2008, 10:21 | לא להפריע! אני יוצאת לשבתון!!! | 1256139 | scan (4).pdf p47 | page 2 of 2 |
-| 2008-05-30 | 30 במאי 2008, 12:12 | על המדרכה. (ספור לשבת) | 1259556 | scan (4).pdf p63 | page 2 of 2 |
-| 2008-06-18 | 18 ביוני 2008, 16:03 | הנסיכה - אגדה שהייתה באמת | 1272964 | scan (5).pdf p45-47 | page 3 of 3 |
-| 2008-07-01 | 1 ביולי 2008, 9:29 | עד גיל 21 תגיעי לירח... | 1281576 | scan (12).pdf p3 | page 2 of 2 (borderline: body may be complete, only the nav page is absent) |
-| 2008-07-03 | 3 ביולי 2008, 10:38 | גברת צימר מכה שנית. | 1283048 | scan (12).pdf p11 | page 2 of 2 |
-| 2008-07-09 | 9 ביולי 2008, 8:02 | אז למה לי פוליטיקה עכשיו? באמת למה??? | 1286965 | scan (12).pdf p29 | page 2 of 2 |
-| 2008-10-09 | 9 באוקטובר 2008, 19:08 | השרביט של פרונת... | 1344033 | scan (21).pdf p31 | page 2 of 2 |
-| 2008-10-12 | 12 באוקטובר 2008, 18:47 | של מי הילדים האלה לעזאזל? | 1346069 | scan (21).pdf p43 | page 2 of 2 |
+Confirmation method: the scan-position gaps line up (each post sits exactly one scan page
+before the next post's slot, e.g. 147 at p29 → 148 at p31 → 149 at p33), and the double-sided
+scan drops blank backs — so the "Page X of Y" counter's Y includes the nav page.
 
-Re-scanned in 2026 and now complete (removed from this list): 1257967, 1260454, 1288875.
+| Publish date | Title | EntryId | Source |
+|---|---|---|---|
+| 2008-05-21 | מי פה המבוגר האחראי? | 1253887 | scan (4).pdf p31 |
+| 2008-05-25 | לא להפריע! אני יוצאת לשבתון!!! | 1256139 | scan (4).pdf p47 |
+| 2008-05-30 | על המדרכה. (ספור לשבת) | 1259556 | scan (4).pdf p63 |
+| 2008-06-18 | הנסיכה - אגדה שהייתה באמת | 1272964 | scan (5).pdf p45-47 (2 content pages) |
+| 2008-07-01 | עד גיל 21 תגיעי לירח... | 1281576 | scan (12).pdf p3 |
+| 2008-07-03 | גברת צימר מכה שנית. | 1283048 | scan (12).pdf p11 |
+| 2008-07-09 | אז למה לי פוליטיקה עכשיו? באמת למה??? | 1286965 | scan (12).pdf p29 |
+| 2008-10-09 | השרביט של פרונת... | 1344033 | scan (21).pdf p31 |
+| 2008-10-12 | של מי הילדים האלה לעזאזל? | 1346069 | scan (21).pdf p43 |
 
-Note: the losses cluster, which may help locate the remaining sheets — three May posts
-print together in scan (4), three July posts in scan (12).
+Three others (1257967, 1260454, 1288875) were physically re-scanned in 2026 and archived.
 
-Dates and titles are OCR-read from the scans; spot-check against the originals before relying on them.
-
-## Different loss type: margin truncation (1 post)
+## Still open — margin truncation (1 post)
 
 Post EntryId **1280359** ("פרי הגפן...", 29 June 2008, file `104_EID1280359.md`) is not missing a
 page. All 4 pages scanned, but the **left margin is cut off**, so several line-starts are absent and

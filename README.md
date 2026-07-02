@@ -16,7 +16,7 @@ images/          Photos embedded in posts, deskewed. Referenced from each post's
 gallery/         Standalone gallery of photos of חיה (photos/ + photos.yaml manifest). See gallery/README.md.
 index.csv        Machine-readable index of all posts (order, EntryId, date, source location).
 index.md         Human-readable index and scanning notes.
-posts_to_rescan.md  9 posts still missing a scanned page; excluded here until re-scanned.
+posts_to_rescan.md  Re-scan tracker. The 9 "missing-page" posts were recovered (nav page, not body, was absent); only 1280359 (margin cut off) still needs a physical re-scan.
 ```
 
 ## Frontmatter
@@ -44,5 +44,7 @@ with a vision model for accuracy. Dates and text may still contain OCR errors, s
 scanned PDF in `posts-pdf/` as the authoritative source when in doubt. Posts flagged in
 `review` need a manual pass.
 
-182 posts exist in total. 173 are archived here. 9 are missing a scanned page and are listed
-in `posts_to_rescan.md` for re-scanning.
+All 182 posts are archived here. (An earlier count held back 9 posts as "missing a page";
+on review the absent page was in each case the trailing navigation page, not body text, so
+they were recovered from the scans and added.) One archived post, 1280359, still needs a
+physical re-scan because its left margin was cut off — see `posts_to_rescan.md`.
