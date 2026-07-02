@@ -1,0 +1,15 @@
+---
+import { getTag } from '../lib/tags';
+import { withBase } from '../lib/url';
+const { tags = [] } = Astro.props;
+const resolved = tags.map(getTag);
+---
+{resolved.length > 0 && (
+  <ul class="tag-chips">
+    {resolved.map((t) => (
+      <li>
+        <a class:list={['tag-chip', `tag-chip--${t.kind}`]} href={withBase(`tags/${t.id}`)}>{t.label}</a>
+      </li>
+    ))}
+  </ul>
+)}

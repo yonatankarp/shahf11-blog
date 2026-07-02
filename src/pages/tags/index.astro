@@ -1,0 +1,60 @@
+---
+import Base from '../../layouts/Base.astro';
+import { allTagsWithCounts } from '../../lib/tags';
+import { withBase } from '../../lib/url';
+
+const tags = await allTagsWithCounts();
+const people = tags.filter((t) => t.kind === 'person');
+const topics = tags.filter((t) => t.kind === 'topic');
+const searchKey = (t: (typeof tags)[number]) =>
+  [t.label, ...(t.aliases ?? []), t.id].join(' ').toLowerCase();
+---
+<Base title="תגיות — חיה בסרט(ן)">
+  <div class="tags-index">
+    <h1>עיון לפי תגית</h1>
+    <p class="eyebrow">מצאו את הרשומות לפי בן משפחה או נושא — גם בחיפוש לפי כינוי או שם</p>
+    <input id="tag-filter" class="tag-filter" type="search" placeholder="חיפוש תגית…" autocomplete="off" />
+
+    {people.length > 0 && (
+      <section>
+        <h2>בני המשפחה</h2>
+        <ul class="tag-rows">
+          {people.map((t) => (
+            <li data-search={searchKey(t)}>
+              <a href={withBase(`tags/${t.id}`)}>{t.label}</a>
+              <span class="tag-count">({t.count})</span>
+              {t.aliases?.length ? <span class="tag-aka">{t.aliases.join(' · ')}</span> : null}
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {topics.length > 0 && (
+      <section>
+        <h2>נושאים</h2>
+        <ul class="tag-chips tag-chips--index">
+          {topics.map((t) => (
+            <li data-search={searchKey(t)}>
+              <a class="tag-chip tag-chip--topic" href={withBase(`tags/${t.id}`)}>{t.label} <span class="tag-count">({t.count})</span></a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {tags.length === 0 && <p>עדיין לא הוגדרו תגיות.</p>}
+  </div>
+
+  <script is:inline>
+    const input = document.getElementById('tag-filter');
+    const items = document.querySelectorAll('[data-search]');
+    input?.addEventListener('input', () => {
+      const q = input.value.trim().toLowerCase();
+      for (const el of items) {
+        const hay = el.getAttribute('data-search') || '';
+        el.style.display = !q || hay.includes(q) ? '' : 'none';
+      }
+    });
+  </script>
+</Base>

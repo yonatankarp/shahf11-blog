@@ -17,6 +17,7 @@ const { title, description } = Astro.props;
     <header class="site-header">
       <a class="site-header__link" href={withBase('/')}><h1 class="site-header__title">חיה בסרט(ן)</h1></a>
       <p class="site-header__tagline">הסרט שלי השנה: סרטן השד. האמונה שלי: השד לא נורא כל כך</p>
+      <nav class="site-nav"><a href={withBase('/')}>ארכיון</a> · <a href={withBase('tags')}>תגיות</a> · <a href={withBase('about')}>על הבלוג</a></nav>
     </header>
     <hr class="masthead-rule" />
     <main class="wrap"><slot /></main>
