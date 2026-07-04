@@ -1,24 +1,168 @@
 # Photo gallery manifest for חיה בסרט(ן)
 #
 # One entry per photo. Photos themselves go in gallery/photos/.
-# This file is the data; how it is laid out visually is decided later
-# with the site design (Phase 2). Nothing here renders yet.
-#
-# Fields per photo:
-#   file:    (required) filename inside gallery/photos/, e.g. "chaya-beach-1998.jpg"
-#   caption: (optional) Hebrew caption shown with the photo
-#   date:    (optional) when the photo was taken; a year "1998" or full date "1998-07-01" both fine
-#   credit:  (optional) who took it or where it came from
-#   alt:     (optional) short description for screen readers; defaults to caption if omitted
-#
-# Display order follows the order of this list, so arrange entries as you want them shown.
-#
-# Example (remove the leading '#' and fill in real values when photos arrive):
-# photos:
-#   - file: chaya-graduation-1985.jpg
-#     caption: "חיה ביום סיום התיכון"
-#     date: "1985"
-#     credit: "אלבום המשפחה"
-#     alt: "חיה מחייכת בגלימת סיום"
+# Display order follows the order of this list.
 
-photos: []
+photos:
+  - file: haya-gallery-001.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699206.965877.jpg"
+  - file: haya-gallery-002.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699247.662005.jpg"
+  - file: haya-gallery-003.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699282.745634.jpg"
+  - file: haya-gallery-004.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699318.774726.jpg"
+  - file: haya-gallery-005.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699348.196690.jpg"
+  - file: haya-gallery-006.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699378.359380.jpg"
+  - file: haya-gallery-007.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699506.574907.jpg"
+  - file: haya-gallery-008.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699524.542604.jpg"
+  - file: haya-gallery-009.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699550.080870.jpg"
+  - file: haya-gallery-010.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699592.793256.jpg"
+  - file: haya-gallery-011.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699613.644338.jpg"
+  - file: haya-gallery-012.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699638.921959.jpg"
+  - file: haya-gallery-013.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699668.424025.jpg"
+  - file: haya-gallery-014.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699702.634640.jpg"
+  - file: haya-gallery-015.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699722.175563.jpg"
+  - file: haya-gallery-016.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699780.293062.jpg"
+  - file: haya-gallery-017.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699810.863617.jpg"
+  - file: haya-gallery-018.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576699988.630092.jpg"
+  - file: haya-gallery-019.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700052.040621.jpg"
+  - file: haya-gallery-020.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700090.736044.jpg"
+  - file: haya-gallery-021.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700130.194777.jpg"
+  - file: haya-gallery-022.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700188.732474.jpg"
+  - file: haya-gallery-023.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700235.872633.jpg"
+  - file: haya-gallery-024.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700303.893541.jpg"
+  - file: haya-gallery-025.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700526.410172.jpg"
+  - file: haya-gallery-026.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700572.700862.jpg"
+  - file: haya-gallery-027.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700602.357512.jpg"
+  - file: haya-gallery-028.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700705.258890.jpg"
+  - file: haya-gallery-029.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700746.411159.jpg"
+  - file: haya-gallery-030.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700769.469100.jpg"
+  - file: haya-gallery-031.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700792.921756.jpg"
+  - file: haya-gallery-032.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700810.835263.jpg"
+  - file: haya-gallery-033.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700866.329992.jpg"
+  - file: haya-gallery-034.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700894.254652.jpg"
+  - file: haya-gallery-035.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700930.587288.jpg"
+  - file: haya-gallery-036.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700953.871195.jpg"
+  - file: haya-gallery-037.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700967.839387.jpg"
+  - file: haya-gallery-038.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576700989.352517.jpg"
+  - file: haya-gallery-039.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576701031.808832.jpg"
+  - file: haya-gallery-040.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576701056.550067.jpg"
+  - file: haya-gallery-041.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576701085.149480.jpg"
+  - file: haya-gallery-042.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576701103.809111.jpg"
+  - file: haya-gallery-043.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 576701119.924613.jpg"
+  - file: haya-gallery-044.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 580379772.702432.jpg"
+  - file: haya-gallery-045.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 580379812.052727.jpg"
+  - file: haya-gallery-046.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 580379830.931516.jpg"
+  - file: haya-gallery-047.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 580379854.699956.jpg"
+  - file: haya-gallery-048.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 580379878.179818.jpg"
+  - file: haya-gallery-049.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 580379912.037677.jpg"
+  - file: haya-gallery-050.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 580379932.303868.jpg"
+  - file: haya-gallery-051.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / 580379953.455308.jpg"
+  - file: haya-gallery-053.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / P1011376.jpg"
+  - file: haya-gallery-054.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / P1011377.jpg"
+  - file: haya-gallery-055.jpg
+    alt: "תמונה של חיה"
+    credit: "Photos-3-001 / P1011391.jpg"

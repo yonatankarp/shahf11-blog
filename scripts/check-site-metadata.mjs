@@ -3,7 +3,7 @@
 // won't catch on its own:
 //   1. every page keeps <html lang="he" dir="rtl"> (RTL is core to this blog)
 //   2. every page has a non-empty <title>
-//   3. every <img> pointing at images/ is base-prefixed (/shahf11-blog/images/)
+//   3. every local <img> pointing at images/ or gallery/photos/ is base-prefixed
 //      — this is what rewriteImageBase + withBase produce; a miss ships broken
 //      images that still build fine
 //   4. each referenced image file actually exists in dist/
@@ -50,9 +50,9 @@ for (const file of files) {
 
   for (const m of html.matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["']/gi)) {
     const src = m[1];
-    if (!/(?:^|\/|\.\.\/)images\//.test(src)) continue;
+    if (!/(?:^|\/|\.\.\/)(?:images|gallery\/photos)\//.test(src)) continue;
     imgCount += 1;
-    if (!src.startsWith(`${BASE}/images/`)) {
+    if (!src.startsWith(`${BASE}/`)) {
       failures.push(`${rel}: image src not base-prefixed: ${src}`);
       continue;
     }
@@ -68,6 +68,15 @@ const postCount = existsSync(postsDir)
   ? (await readdir(postsDir, { withFileTypes: true })).filter((d) => d.isDirectory()).length
   : 0;
 if (postCount < 1) failures.push('no post pages generated under dist/posts/');
+
+const galleryHtml = await readFile(path.join(distDir, 'gallery', 'index.html'), 'utf8');
+const galleryImageCount = new Set(
+  [...galleryHtml.matchAll(/<img\b[^>]*\bsrc=["']([^"']*\/gallery\/photos\/[^"']+)["']/gi)].map((match) => match[1]),
+).size;
+if (galleryImageCount !== 54) failures.push(`gallery page expected 54 photos, found ${galleryImageCount}`);
+for (const requiredClass of ['gallery-carousel', 'gallery-lightbox', 'data-gallery-index']) {
+  if (!galleryHtml.includes(requiredClass)) failures.push(`gallery page missing ${requiredClass}`);
+}
 
 if (failures.length > 0) {
   console.error('Site metadata check failed:');

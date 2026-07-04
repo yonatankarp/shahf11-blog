@@ -5,7 +5,7 @@ import '@fontsource/secular-one/400.css';
 import '@fontsource/heebo/700.css';
 import '../styles/global.css';
 import { withBase } from '../lib/url';
-const { title, description } = Astro.props;
+const { title, description, wide = false } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '');
 const isActive = (href) => {
   const clean = withBase(href).replace(/\/$/, '');
@@ -38,7 +38,7 @@ const nav = [
         ))}
       </nav>
     </header>
-    <main id="main" class="wrap"><slot /></main>
+    <main id="main" class:list={['wrap', { 'wrap--wide': wide }]}><slot /></main>
     <footer class="site-footer">
       ארכיון הבלוג של חיה · <a href={withBase('about')}>על הבלוג</a> · <a href="https://github.com/yonatankarp/shahf11-blog">GitHub</a>
     </footer>
