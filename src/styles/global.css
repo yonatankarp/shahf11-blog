@@ -49,6 +49,8 @@ a { color: var(--red); text-underline-offset: .16em; text-decoration-thickness: 
 .disp { font-family: var(--disp); font-weight: 400; letter-spacing: .005em; }
 .wrap { max-inline-size: var(--measure); margin-inline: auto; padding-inline: 1.4rem; }
 .wrap--wide { max-inline-size: 78rem; }
+/* give the content real room on desktop; mobile keeps the tight measure */
+@media (min-width: 64rem) { :root { --measure: 48rem; } }
 
 /* shared eyebrow / small label */
 .eyebrow {
