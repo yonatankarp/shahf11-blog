@@ -345,6 +345,11 @@ h1, h2, h3 { line-height: 1.25; text-wrap: balance; }
 .letter h3 { margin-bottom: .75rem; }
 .letter--poem { text-align: center; font-style: italic; white-space: normal; }
 .letter--poem p { margin: 1rem 0; }
+.book-downloads { margin-top: 3rem; }
+.book-download-card { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-start; }
+.book-cover { width: 200px; max-width: 40%; height: auto; border-radius: 4px; box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+.book-download-card__body { flex: 1 1 16rem; line-height: 1.9; }
+.book-downloads__links { display: flex; flex-direction: column; gap: .5rem; margin-top: 1rem; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
