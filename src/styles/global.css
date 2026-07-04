@@ -174,7 +174,7 @@ a.cat:hover { filter: brightness(1.1); }
 /* raised initial: the big red letter rises above the first line, and the rest of the
    line sits on its baseline (aligned to the letter's bottom, not its top) */
 .post__body > p:first-of-type::first-letter {
-  font-family: var(--disp); font-size: 3.1rem; line-height: 1; color: var(--red);
+  font-family: var(--serif); font-size: 3.1rem; line-height: 1; color: var(--red);
   vertical-align: baseline; margin-inline-end: .06em;
 }
 .post__note {
