@@ -15,7 +15,7 @@
 
   --serif: 'Frank Ruhl Libre Variable', 'Frank Ruhl Libre', Georgia, serif;
   --sans:  'Assistant Variable', 'Assistant', system-ui, sans-serif;
-  --disp:  'Secular One', var(--serif);
+  --disp:  'Gveret Levin', 'Secular One', var(--serif);
   --heebo: 'Heebo', var(--sans);
   --measure: 34rem;
 }
