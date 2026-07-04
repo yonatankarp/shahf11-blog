@@ -1,0 +1,40 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getAllPosts } from '../../lib/posts';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths({ paginate }) {
+  const posts = await getAllPosts();
+  return paginate(posts, { pageSize: 15 });
+}
+const { page } = Astro.props;
+const pageHref = (n) => withBase(n === 1 ? 'blog' : `blog/${n}`);
+const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
+---
+<Base title="חיה בסרט(ן) — הבלוג">
+  <div class="tag-page">
+    <h1 class="tag-page__title">הבלוג</h1>
+    <p class="eyebrow">כל הרשומות, מהחדשה לישנה · עמוד {page.currentPage}</p>
+  </div>
+  <div class="feed">
+    {page.data.map((post) => <PostCard post={post} />)}
+  </div>
+  <nav class="pagination" aria-label="ניווט בין עמודי הארכיון">
+    {page.url.prev
+      ? <a class="pagination__step" href={page.url.prev}>חדשים יותר →</a>
+      : <span class="pagination__step is-disabled">חדשים יותר →</span>}
+    <ol class="pagination__pages">
+      {pages.map((n) => (
+        <li>
+          {n === page.currentPage
+            ? <span class="pagination__page is-current" aria-current="page">{n}</span>
+            : <a class="pagination__page" href={pageHref(n)}>{n}</a>}
+        </li>
+      ))}
+    </ol>
+    {page.url.next
+      ? <a class="pagination__step" href={page.url.next}>← ישנים יותר</a>
+      : <span class="pagination__step is-disabled">← ישנים יותר</span>}
+  </nav>
+</Base>

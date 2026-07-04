@@ -1,0 +1,39 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import { load as loadYaml } from 'js-yaml';
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/url';
+
+// The manifest lives at the repo root (gallery/photos.yaml). Photos are added there over
+// time by the family; when the list is empty we show a gentle placeholder.
+const manifestPath = path.join(process.cwd(), 'gallery', 'photos.yaml');
+let photos = [];
+try {
+  const doc = loadYaml(fs.readFileSync(manifestPath, 'utf8'));
+  photos = Array.isArray(doc?.photos) ? doc.photos : [];
+} catch {
+  photos = [];
+}
+---
+<Base title="גלריה — חיה בסרט(ן)" description="תמונות של חיה.">
+  <div class="gallery-page">
+    <h1>גלריה</h1>
+    <p class="eyebrow">תמונות של חיה</p>
+
+    {photos.length === 0 ? (
+      <div class="gallery-empty">
+        <p>התמונות עדיין נאספות ויתווספו כאן בהמשך.</p>
+      </div>
+    ) : (
+      <div class="gallery-grid">
+        {photos.map((p) => (
+          <figure>
+            <img src={withBase(`gallery/${p.file}`)} alt={p.alt ?? p.caption ?? ''} loading="lazy" />
+            {p.caption && <figcaption>{p.caption}</figcaption>}
+          </figure>
+        ))}
+      </div>
+    )}
+  </div>
+</Base>

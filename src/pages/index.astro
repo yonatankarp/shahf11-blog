@@ -1,0 +1,62 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+import { getAllPosts } from '../lib/posts';
+import { HIGHLIGHTS } from '../data/highlights';
+import { withBase } from '../lib/url';
+
+const posts = await getAllPosts(); // newest-first
+const oldest = posts[posts.length - 1];
+const total = posts.length;
+
+// Curated highlights (see src/data/highlights.ts) — not the chronologically-latest posts.
+const byId = new Map(posts.map((p) => [p.data.entryId, p]));
+const highlights = HIGHLIGHTS.map((id) => byId.get(id)).filter(Boolean);
+
+// A portrait of Haya for the hero + film poster. Just drop a photo into public/ named
+// haya.jpg (or .jpeg/.png/.webp) — it lights up automatically, no code change. Until then
+// the hero stays purely typographic.
+const PUB = path.join(process.cwd(), 'public');
+const photoFile = ['haya.jpg', 'haya.jpeg', 'haya.png', 'haya.webp'].find((f) => fs.existsSync(path.join(PUB, f)));
+const heroPhoto = photoFile ? withBase(photoFile) : null;
+---
+<Base
+  title="חיה בסרט(ן) — בלוג הזיכרון של חיה"
+  description="ארכיון הבלוג 'חיה בסרט(ן)' מאת חיה, 2008–2009. מסע התמודדות עם סרטן השד, בהומור ובאומץ."
+>
+  <section class="home-hero">
+    <p class="home-hero__eyebrow">בלוג הזיכרון של חיה</p>
+    {heroPhoto && <img class="home-hero__photo" src={heroPhoto} alt="חיה" width="180" height="180" />}
+    <h1 class="home-hero__title">חיה בסרט<span class="paren">(ן)</span></h1>
+    <p class="home-hero__quote">הסרט שלי השנה: סרטן השד. האמונה שלי: השד לא נורא כל כך.</p>
+    <p class="home-hero__ded">
+      בין 2008 ל־2009 כתבה כאן חיה על המחלה — בהומור, בכעס ובאומץ. הבלוג נשמר כאן,
+      {' '}{total} רשומות, בקולה שלה. לזכרה, ובאהבה, ממשפחתה.
+    </p>
+    <div class="home-hero__meta">
+      <span dir="ltr">2008–2009</span><span class="dot" aria-hidden="true"></span><span>{total} רשומות</span>
+    </div>
+    {oldest && <a class="home-cta" href={withBase(`posts/${oldest.data.entryId}`)}>קראו מההתחלה</a>}
+  </section>
+
+  <section class="home-film">
+    <div class="feed__head"><h2 class="disp">הסרט שלה</h2></div>
+    <figure class="film">
+      <video class="film__video" controls preload="metadata" poster={heroPhoto ?? undefined}>
+        <source src={withBase('video/graduation-film-2009.mp4')} type="video/mp4" />
+        הדפדפן שלך אינו תומך בהפעלת וידאו.
+      </video>
+      <figcaption class="film__cap">״חיה בסרט(ן)״ — סרט גמר, יוני 2009</figcaption>
+    </figure>
+  </section>
+
+  <section class="feed home-recent">
+    <div class="feed__head">
+      <h2 class="disp">רשומות נבחרות</h2>
+      <a href={withBase('blog')}>כל הרשומות ←</a>
+    </div>
+    {highlights.map((post) => <PostCard post={post} />)}
+  </section>
+</Base>

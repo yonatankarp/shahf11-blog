@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import { unified } from '@astrojs/markdown-remark';
 import { rewriteImageBase } from './src/lib/rehype-image-base.mjs';
+import { dropTitleH1 } from './src/lib/rehype-drop-title.mjs';
 
 export default defineConfig({
   site: 'https://yonatankarp.com',
@@ -8,5 +9,5 @@ export default defineConfig({
   trailingSlash: 'ignore',
   // Astro 7 defaults to the Sätteri processor; opt into the unified processor
   // explicitly so our rehype plugin runs (replaces the deprecated markdown.rehypePlugins).
-  markdown: { processor: unified({ rehypePlugins: [rewriteImageBase] }) },
+  markdown: { processor: unified({ rehypePlugins: [rewriteImageBase, dropTitleH1] }) },
 });

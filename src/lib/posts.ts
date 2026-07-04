@@ -18,6 +18,7 @@ export async function getAdjacent(entryId: string) {
 
 export function excerpt(body: string, words = 30): string {
   const text = body
+    .replace(/^\s*#[^\n]*\n+/, '') // drop the leading "# <title>" heading each post opens with
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '') // images
     .replace(/[#>*_`\[\]]/g, '')
     .replace(/\s+/g, ' ')

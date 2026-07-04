@@ -1,0 +1,45 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PostCard from '../../../components/PostCard.astro';
+import { allTagsWithCounts } from '../../../lib/tags';
+import { withBase } from '../../../lib/url';
+
+export async function getStaticPaths({ paginate }) {
+  const tags = await allTagsWithCounts();
+  return tags.flatMap((tag) =>
+    paginate(tag.posts, { params: { slug: tag.id }, props: { tag }, pageSize: 15 }),
+  );
+}
+const { page, tag } = Astro.props;
+const pageHref = (n) => withBase(n === 1 ? `tags/${tag.id}` : `tags/${tag.id}/${n}`);
+const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
+---
+<Base title={`${tag.label} — חיה בסרט(ן)`}>
+  <div class="tag-page">
+    <p class="eyebrow"><a href={withBase('tags')}>← כל התגיות</a></p>
+    <h1 class="tag-page__title">{tag.label}</h1>
+    <p class="eyebrow">{tag.count} רשומות{page.lastPage > 1 ? ` · עמוד ${page.currentPage}` : ''}</p>
+  </div>
+  <div class="feed">
+    {page.data.map((post) => <PostCard post={post} />)}
+  </div>
+  {page.lastPage > 1 && (
+    <nav class="pagination" aria-label="ניווט בין עמודי התגית">
+      {page.url.prev
+        ? <a class="pagination__step" href={page.url.prev}>חדשים יותר →</a>
+        : <span class="pagination__step is-disabled">חדשים יותר →</span>}
+      <ol class="pagination__pages">
+        {pages.map((n) => (
+          <li>
+            {n === page.currentPage
+              ? <span class="pagination__page is-current" aria-current="page">{n}</span>
+              : <a class="pagination__page" href={pageHref(n)}>{n}</a>}
+          </li>
+        ))}
+      </ol>
+      {page.url.next
+        ? <a class="pagination__step" href={page.url.next}>← ישנים יותר</a>
+        : <span class="pagination__step is-disabled">← ישנים יותר</span>}
+    </nav>
+  )}
+</Base>

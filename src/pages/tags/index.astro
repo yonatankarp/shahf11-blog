@@ -4,57 +4,99 @@ import { allTagsWithCounts } from '../../lib/tags';
 import { withBase } from '../../lib/url';
 
 const tags = await allTagsWithCounts();
-const people = tags.filter((t) => t.kind === 'person');
-const topics = tags.filter((t) => t.kind === 'topic');
+const byCount = (a: { count: number }, b: { count: number }) => b.count - a.count;
+// Only list family members who recur through the blog; the barely-mentioned ones (≤3 posts,
+// often not even named) are hidden from the browse list. Their tag pages still work if linked.
+const people = tags.filter((t) => t.kind === 'person' && t.count > 3).sort(byCount);
+const topics = tags.filter((t) => t.kind === 'topic').sort(byCount);
 const searchKey = (t: (typeof tags)[number]) =>
   [t.label, ...(t.aliases ?? []), t.id].join(' ').toLowerCase();
 ---
-<Base title="תגיות — חיה בסרט(ן)">
+<Base title="חיפוש ותגיות — חיה בסרט(ן)">
   <div class="tags-index">
-    <h1>עיון לפי תגית</h1>
-    <p class="eyebrow">מצאו את הרשומות לפי בן משפחה או נושא — גם בחיפוש לפי כינוי או שם</p>
-    <input id="tag-filter" class="tag-filter" type="search" placeholder="חיפוש תגית…" autocomplete="off" />
+    <h1 class="disp">חיפוש ותגיות</h1>
+    <p class="eyebrow">חפשו כל מילה מהבלוג, או עיינו לפי בן משפחה ונושא</p>
+    <label for="site-search" class="sr-only">חיפוש בכל הרשומות, וגם לפי שם, כינוי, תפקיד או נושא</label>
+    <input id="site-search" class="tag-filter" type="search" placeholder="חיפוש — מילה, שם, כינוי או נושא…" autocomplete="off" />
 
-    {people.length > 0 && (
-      <section>
-        <h2>בני המשפחה</h2>
-        <ul class="tag-rows">
-          {people.map((t) => (
-            <li data-search={searchKey(t)}>
-              <a href={withBase(`tags/${t.id}`)}>{t.label}</a>
-              <span class="tag-count">({t.count})</span>
-              {t.aliases?.length ? <span class="tag-aka">{t.aliases.join(' · ')}</span> : null}
-            </li>
-          ))}
-        </ul>
-      </section>
-    )}
+    <section id="search-results" class="search-results" data-index={withBase('search-index.json')} hidden>
+      <p class="search-results__count" aria-live="polite"></p>
+      <ul class="search-hits"></ul>
+    </section>
 
-    {topics.length > 0 && (
-      <section>
-        <h2>נושאים</h2>
-        <ul class="tag-chips tag-chips--index">
-          {topics.map((t) => (
-            <li data-search={searchKey(t)}>
-              <a class="tag-chip tag-chip--topic" href={withBase(`tags/${t.id}`)}>{t.label} <span class="tag-count">({t.count})</span></a>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )}
+    <div id="tag-browse">
+      {people.length > 0 && (
+        <section>
+          <h2>בני המשפחה</h2>
+          <ul class="tag-rows">
+            {people.map((t) => (
+              <li data-search={searchKey(t)}>
+                <a href={withBase(`tags/${t.id}`)}>{t.label}</a>
+                <span class="tag-count">({t.count})</span>
+                {t.aliases?.length ? <span class="tag-aka">{t.aliases.join(' · ')}</span> : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
-    {tags.length === 0 && <p>עדיין לא הוגדרו תגיות.</p>}
+      {topics.length > 0 && (
+        <section>
+          <h2>נושאים</h2>
+          <ul class="tag-chips tag-chips--index">
+            {topics.map((t) => (
+              <li data-search={searchKey(t)}>
+                <a class="tag-chip tag-chip--topic" href={withBase(`tags/${t.id}`)}>{t.label} <span class="tag-count">({t.count})</span></a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {tags.length === 0 && <p>עדיין לא הוגדרו תגיות.</p>}
+    </div>
   </div>
 
   <script is:inline>
-    const input = document.getElementById('tag-filter');
-    const items = document.querySelectorAll('[data-search]');
-    input?.addEventListener('input', () => {
+    const input = document.getElementById('site-search');
+    const browse = document.getElementById('tag-browse');
+    const results = document.getElementById('search-results');
+    const countEl = results.querySelector('.search-results__count');
+    const hitsEl = results.querySelector('.search-hits');
+    const tagItems = browse.querySelectorAll('[data-search]');
+    const indexUrl = results.getAttribute('data-index');
+    let index = null;
+
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    async function ensureIndex() {
+      if (!index) index = await fetch(indexUrl).then((r) => r.json()).catch(() => []);
+      return index;
+    }
+
+    async function run() {
       const q = input.value.trim().toLowerCase();
-      for (const el of items) {
+      // filter the tag lists (people + topics) as before
+      for (const el of tagItems) {
         const hay = el.getAttribute('data-search') || '';
         el.style.display = !q || hay.includes(q) ? '' : 'none';
       }
-    });
+      if (!q) { results.hidden = true; hitsEl.innerHTML = ''; return; }
+      const idx = await ensureIndex();
+      const matches = idx.filter((p) => p.text.includes(q));
+      const shown = matches.slice(0, 50);
+      countEl.textContent = matches.length
+        ? `${matches.length} רשומות שמזכירות ״${input.value.trim()}״`
+        : `לא נמצאו רשומות עבור ״${input.value.trim()}״`;
+      hitsEl.innerHTML = shown.map((p) =>
+        `<li class="search-hit"><a class="search-hit__title" href="${esc(p.url)}">${esc(p.title)}</a>` +
+        `<span class="search-hit__date">${esc(p.date)}</span>` +
+        `<p class="search-hit__ex">${esc(p.excerpt)}</p></li>`).join('') +
+        (matches.length > shown.length ? `<li class="search-hit__more">מוצגות ${shown.length} מתוך ${matches.length}. צמצמו את החיפוש.</li>` : '');
+      results.hidden = false;
+    }
+
+    input?.addEventListener('input', run);
   </script>
 </Base>
