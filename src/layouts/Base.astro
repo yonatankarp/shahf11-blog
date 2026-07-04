@@ -1,9 +1,24 @@
 ---
 import '@fontsource-variable/frank-ruhl-libre';
 import '@fontsource-variable/assistant';
+import '@fontsource/secular-one/400.css';
+import '@fontsource/heebo/700.css';
 import '../styles/global.css';
 import { withBase } from '../lib/url';
 const { title, description } = Astro.props;
+const path = Astro.url.pathname.replace(/\/$/, '');
+const isActive = (href) => {
+  const clean = withBase(href).replace(/\/$/, '');
+  if (href === '/') return path === clean || path === withBase('').replace(/\/$/, '');
+  return path === clean || path.startsWith(clean + '/');
+};
+const nav = [
+  { href: '/', label: 'בית' },
+  { href: 'blog', label: 'הבלוג' },
+  { href: 'tags', label: 'חיפוש' },
+  { href: 'gallery', label: 'גלריה' },
+  { href: 'about', label: 'על הבלוג' },
+];
 ---
 <!doctype html>
 <html lang="he" dir="rtl">
@@ -14,15 +29,18 @@ const { title, description } = Astro.props;
     {description && <meta name="description" content={description} />}
   </head>
   <body>
-    <header class="site-header">
-      <a class="site-header__link" href={withBase('/')}><h1 class="site-header__title">חיה בסרט(ן)</h1></a>
-      <p class="site-header__tagline">הסרט שלי השנה: סרטן השד. האמונה שלי: השד לא נורא כל כך</p>
-      <nav class="site-nav"><a href={withBase('/')}>ארכיון</a> · <a href={withBase('tags')}>תגיות</a> · <a href={withBase('about')}>על הבלוג</a></nav>
+    <a class="skip-link" href="#main">דלגו לתוכן</a>
+    <header class="site-nav-bar">
+      <a class="site-nav-bar__brand" href={withBase('/')}>חיה בסרט<span class="paren">(ן)</span></a>
+      <nav class="site-links" aria-label="ניווט ראשי">
+        {nav.map((n) => (
+          <a href={withBase(n.href)} aria-current={isActive(n.href) ? 'page' : undefined}>{n.label}</a>
+        ))}
+      </nav>
     </header>
-    <hr class="masthead-rule" />
-    <main class="wrap"><slot /></main>
+    <main id="main" class="wrap"><slot /></main>
     <footer class="site-footer">
-      ארכיון הבלוג של shahf11 · <a href={withBase('about')}>על הבלוג</a> · <a href="https://github.com/yonatankarp/shahf11-blog">GitHub</a>
+      ארכיון הבלוג של חיה · <a href={withBase('about')}>על הבלוג</a> · <a href="https://github.com/yonatankarp/shahf11-blog">GitHub</a>
     </footer>
   </body>
 </html>

@@ -1,13 +1,18 @@
 ---
 import { excerpt } from '../lib/posts';
+import { getTag } from '../lib/tags';
 import { withBase } from '../lib/url';
-import TagChips from './TagChips.astro';
 const { post } = Astro.props;
 const href = withBase(`posts/${post.data.entryId}`);
+// The source category is always "כללי"; show the post's primary topic instead (first topic tag).
+const topic = (post.data.tags ?? []).map(getTag).find((t) => t.kind === 'topic');
 ---
 <article class="post-card">
-  <p class="eyebrow">{post.data.date_published}</p>
+  <div class="post-card__meta">
+    {topic && <a class="cat" href={withBase(`tags/${topic.id}`)}>{topic.label}</a>}
+    <span class="post-card__date">{post.data.date_published}</span>
+  </div>
   <h2 class="post-card__title"><a href={href}>{post.data.title}</a></h2>
   <p class="excerpt">{excerpt(post.body ?? '')}</p>
-  <TagChips tags={post.data.tags} />
+  <a class="post-card__more" href={href}>המשך קריאה ←</a>
 </article>

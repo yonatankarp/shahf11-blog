@@ -20,7 +20,7 @@ const posts = defineCollection({
     images: z.array(z.string()).default([]),
     review: z.array(z.string()).default([]),
     note: z.string().default(''),
-    tags: z.array(z.string()).default([]), // forward-compat: unused now
+    tags: z.array(z.string()).default([]), // person + topic tag ids; see src/data/tags.ts
   }),
 });
 
