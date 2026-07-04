@@ -110,6 +110,15 @@ a { color: var(--red); text-underline-offset: .16em; text-decoration-thickness: 
   border: 3px solid var(--panel); box-shadow: 0 8px 28px -12px rgba(0,0,0,.4);
 }
 
+/* biography */
+.home-story {
+  max-width: 60ch;
+  margin: 2.5rem auto;
+  text-align: center;
+  line-height: 1.9;
+  color: var(--ink, #2b2b2b);
+}
+
 /* featured film */
 .home-film { max-inline-size: 42rem; margin: 0 auto; padding-block: 1rem 1.5rem; }
 .film { margin: 0; }
