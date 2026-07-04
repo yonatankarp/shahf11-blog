@@ -26,8 +26,8 @@ const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
   {page.lastPage > 1 && (
     <nav class="pagination" aria-label="ניווט בין עמודי התגית">
       {page.url.prev
-        ? <a class="pagination__step" href={page.url.prev}>חדשים יותר →</a>
-        : <span class="pagination__step is-disabled">חדשים יותר →</span>}
+        ? <a class="pagination__step" href={page.url.prev}>ישנים יותר →</a>
+        : <span class="pagination__step is-disabled">ישנים יותר →</span>}
       <ol class="pagination__pages">
         {pages.map((n) => (
           <li>
@@ -38,8 +38,8 @@ const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
         ))}
       </ol>
       {page.url.next
-        ? <a class="pagination__step" href={page.url.next}>← ישנים יותר</a>
-        : <span class="pagination__step is-disabled">← ישנים יותר</span>}
+        ? <a class="pagination__step" href={page.url.next}>← חדשים יותר</a>
+        : <span class="pagination__step is-disabled">← חדשים יותר</span>}
     </nav>
   )}
 </Base>

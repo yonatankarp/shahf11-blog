@@ -4,15 +4,16 @@ export type PostEntry = CollectionEntry<'posts'>;
 
 export async function getAllPosts(): Promise<PostEntry[]> {
   const posts = await getCollection('posts');
-  return posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  // Oldest-first — the blog is complete, so it reads front-to-back like a book.
+  return posts.sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
 }
 
 export async function getAdjacent(entryId: string) {
-  const posts = await getAllPosts(); // newest-first
+  const posts = await getAllPosts(); // oldest-first
   const i = posts.findIndex((p) => p.data.entryId === entryId);
   return {
-    newer: i > 0 ? posts[i - 1] : null,
-    older: i >= 0 && i < posts.length - 1 ? posts[i + 1] : null,
+    older: i > 0 ? posts[i - 1] : null,
+    newer: i >= 0 && i < posts.length - 1 ? posts[i + 1] : null,
   };
 }
 
