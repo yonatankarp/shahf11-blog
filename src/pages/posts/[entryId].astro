@@ -31,12 +31,12 @@ const topic = (post.data.tags ?? []).map(getTag).find((t) => t.kind === 'topic')
         הערה: הסריקה של רשומה זו חתוכה בשוליים וחלק מהטקסט חסר. התמלול הוא כמיטב היכולת; ראו את הסריקה המקורית.
       </p>
     )}
-    <div class="post__body"><Content /></div>
     {extraImgs.length > 0 && (
-      <section class="gallery">
-        {extraImgs.map((f) => <img src={withBase(`images/${f}`)} alt="" loading="lazy" />)}
+      <section class="gallery gallery--lead">
+        {extraImgs.map((f) => <img src={withBase(`images/${f}`)} alt={`תמונה מתוך "${post.data.title}"`} loading="lazy" />)}
       </section>
     )}
+    <div class="post__body"><Content /></div>
     {post.data.tags.length > 0 && (
       <section class="post__tags">
         <span class="eyebrow">תגיות:</span>
