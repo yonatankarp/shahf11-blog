@@ -16,7 +16,7 @@ try {
   photos = [];
 }
 ---
-<Base title="גלריה — חיה בסרט(ן)" description="תמונות של חיה.">
+<Base title="גלריה — חיה בסרט(ן)" description="תמונות של חיה." wide>
   <div class="gallery-page">
     <h1>גלריה</h1>
     <p class="eyebrow">תמונות של חיה</p>
@@ -26,14 +26,106 @@ try {
         <p>התמונות עדיין נאספות ויתווספו כאן בהמשך.</p>
       </div>
     ) : (
-      <div class="gallery-grid">
-        {photos.map((p) => (
-          <figure>
-            <img src={withBase(`gallery/${p.file}`)} alt={p.alt ?? p.caption ?? ''} loading="lazy" />
-            {p.caption && <figcaption>{p.caption}</figcaption>}
+      <>
+        <section class="gallery-carousel" aria-label="תמונות נבחרות" data-gallery-carousel>
+          <button class="gallery-carousel__nav gallery-carousel__nav--prev" type="button" data-gallery-prev aria-label="התמונה הקודמת">‹</button>
+          <div class="gallery-carousel__track">
+            {photos.map((p, index) => (
+              <button class:list={['gallery-carousel__slide', { 'is-active': index === 0 }]} type="button" data-gallery-index={index} aria-label="פתחו תמונה במסך מלא">
+                <img src={withBase(`gallery/photos/${p.file}`)} alt={p.alt ?? p.caption ?? ''} loading={index === 0 ? 'eager' : 'lazy'} />
+              </button>
+            ))}
+          </div>
+          <button class="gallery-carousel__nav gallery-carousel__nav--next" type="button" data-gallery-next aria-label="התמונה הבאה">›</button>
+        </section>
+
+        <div class="gallery-grid">
+          {photos.map((p, index) => (
+            <figure>
+              <button type="button" class="gallery-thumb" data-gallery-index={index} aria-label="פתחו תמונה במסך מלא">
+                <img src={withBase(`gallery/photos/${p.file}`)} alt={p.alt ?? p.caption ?? ''} loading="lazy" />
+              </button>
+              {p.caption && <figcaption>{p.caption}</figcaption>}
+            </figure>
+          ))}
+        </div>
+
+        <dialog class="gallery-lightbox" data-gallery-lightbox aria-label="תמונה מוגדלת">
+          <button class="gallery-lightbox__close" type="button" data-gallery-close aria-label="סגירה">×</button>
+          <button class="gallery-lightbox__nav gallery-lightbox__nav--prev" type="button" data-lightbox-prev aria-label="התמונה הקודמת">‹</button>
+          <figure class="gallery-lightbox__figure">
+            <img data-lightbox-image alt="" />
+            <figcaption data-lightbox-caption></figcaption>
           </figure>
-        ))}
-      </div>
+          <button class="gallery-lightbox__nav gallery-lightbox__nav--next" type="button" data-lightbox-next aria-label="התמונה הבאה">›</button>
+        </dialog>
+
+        <script define:vars={{ photos: photos.map((p) => ({ src: withBase(`gallery/photos/${p.file}`), alt: p.alt ?? p.caption ?? '', caption: p.caption ?? '' })) }}>
+          const slides = [...document.querySelectorAll('[data-gallery-carousel] [data-gallery-index]')];
+          const openers = [...document.querySelectorAll('[data-gallery-index]')];
+          const prevButton = document.querySelector('[data-gallery-prev]');
+          const nextButton = document.querySelector('[data-gallery-next]');
+          const lightbox = document.querySelector('[data-gallery-lightbox]');
+          const lightboxImage = document.querySelector('[data-lightbox-image]');
+          const lightboxCaption = document.querySelector('[data-lightbox-caption]');
+          const lightboxPrev = document.querySelector('[data-lightbox-prev]');
+          const lightboxNext = document.querySelector('[data-lightbox-next]');
+          const closeButton = document.querySelector('[data-gallery-close]');
+          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          let current = 0;
+          let timer;
+
+          const normalize = (index) => (index + photos.length) % photos.length;
+
+          const showSlide = (index) => {
+            current = normalize(index);
+            slides.forEach((slide, slideIndex) => {
+              slide.classList.toggle('is-active', slideIndex === current);
+            });
+          };
+
+          const move = (step) => showSlide(current + step);
+
+          const start = () => {
+            if (prefersReducedMotion || photos.length < 2) return;
+            stop();
+            timer = window.setInterval(() => move(1), 5000);
+          };
+
+          const stop = () => {
+            if (timer) window.clearInterval(timer);
+          };
+
+          const openLightbox = (index) => {
+            current = normalize(index);
+            const photo = photos[current];
+            lightboxImage.src = photo.src;
+            lightboxImage.alt = photo.alt;
+            lightboxCaption.textContent = photo.caption;
+            lightboxCaption.hidden = !photo.caption;
+            if (typeof lightbox.showModal === 'function') lightbox.showModal();
+            else lightbox.setAttribute('open', '');
+          };
+
+          prevButton?.addEventListener('click', () => { move(-1); start(); });
+          nextButton?.addEventListener('click', () => { move(1); start(); });
+          lightboxPrev?.addEventListener('click', () => openLightbox(current - 1));
+          lightboxNext?.addEventListener('click', () => openLightbox(current + 1));
+          closeButton?.addEventListener('click', () => lightbox.close());
+          lightbox?.addEventListener('click', (event) => {
+            if (event.target === lightbox) lightbox.close();
+          });
+          openers.forEach((button) => {
+            button.addEventListener('click', () => openLightbox(Number(button.dataset.galleryIndex)));
+          });
+          document.addEventListener('keydown', (event) => {
+            if (!lightbox?.open) return;
+            if (event.key === 'ArrowLeft') openLightbox(current + 1);
+            if (event.key === 'ArrowRight') openLightbox(current - 1);
+          });
+          start();
+        </script>
+      </>
     )}
   </div>
 </Base>

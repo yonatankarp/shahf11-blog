@@ -10,9 +10,10 @@
     "preview": "astro preview",
     "typecheck": "astro check",
     "check:blog-assets": "node scripts/check-blog-assets.mjs",
+    "check:gallery-assets": "node scripts/check-gallery-assets.mjs",
     "check:site-metadata": "node scripts/check-site-metadata.mjs",
     "visual:capture": "node scripts/capture-screenshots.mjs",
-    "check": "npm run check:blog-assets && npm run build && npm run check:site-metadata"
+    "check": "npm run check:blog-assets && npm run check:gallery-assets && npm run build && npm run check:site-metadata"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.2.0",
