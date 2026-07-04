@@ -340,6 +340,11 @@ h1, h2, h3 { line-height: 1.25; text-wrap: balance; }
 .preface-scans img { width: 100%; height: auto; border: 1px solid rgba(0,0,0,.1); border-radius: 4px; }
 .preface-transcript { margin-top: 1.5rem; line-height: 1.9; }
 .preface-transcript__label { font-size: .85rem; opacity: .7; letter-spacing: .02em; }
+.book-letters { margin-top: 3rem; }
+.letter { margin: 2.5rem 0; line-height: 1.9; }
+.letter h3 { margin-bottom: .75rem; }
+.letter--poem { text-align: center; font-style: italic; white-space: normal; }
+.letter--poem p { margin: 1rem 0; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
