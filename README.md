@@ -11,7 +11,7 @@ blog can be rebuilt as a website, while keeping the scanned PDFs as downloadable
 
 ```
 content/         Markdown page per post (YAML frontmatter + body). The future website pages.
-posts-pdf/       Per-post scanned PDF, one file per post. Downloadable original source.
+public/posts-pdf/  Per-post scanned PDF, one file per post. Downloadable original source.
 images/          Photos embedded in posts, deskewed. Referenced from each post's frontmatter.
 gallery/         Standalone gallery of photos of חיה (photos/ + photos.yaml manifest). See gallery/README.md.
 index.csv        Machine-readable index of all posts (order, EntryId, date, source location).
@@ -26,13 +26,16 @@ Each file in `content/` begins with:
 ```yaml
 entryId:        original tapuz EntryId (stable id, used to chain multi-file posts)
 title:          post title
+title_source:   how the title was determined (e.g. "vision" for vision-model transcription)
 date_published: publish date from the post's "פורסם ב…" line (Hebrew)
+date:           ISO date derived from date_published, used for ordering
 category:       post category
 date_stamp:     the print-stamp date (differs from publish date)
 source_url:     original tapuz print URL
 source_scan:    which scan file and pages this came from
 pages:          number of content pages
 lang: he
+note:           free-text note about the post, if any
 images:         embedded image filenames, if any
 review:         quality flags for pages that need a manual look, if any
 ```
@@ -41,7 +44,7 @@ review:         quality flags for pages that need a manual look, if any
 
 Text is OCR from the scans (tesseract, Hebrew). Body text is high fidelity; titles were read
 with a vision model for accuracy. Dates and text may still contain OCR errors, so treat the
-scanned PDF in `posts-pdf/` as the authoritative source when in doubt. Posts flagged in
+scanned PDF in `public/posts-pdf/` as the authoritative source when in doubt. Posts flagged in
 `review` need a manual pass.
 
 All 182 posts are archived here. (An earlier count held back 9 posts as "missing a page";
