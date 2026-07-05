@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/url';
+---
+<Base title="הספר — חיה בסרט(ן)" description="הספר 'חיה בסרט(ן)' מאת חיה קרפ-צור: הקדמתה בכתב ידה והספר להורדה.">
+  <article class="book-page">
+    <h1>הספר</h1>
+    <section class="book-genesis" aria-label="הקדמה">
+      <p>חלומה של חיה היה להוציא את תכני הבלוג לאור כספר. בעודה בחיים הספיקה לכתוב רק את ההקדמה לספר; מתוך רצון להגשים את חלומה, בני משפחתה הוציאו את רישומיה כספר, וצירפו את הקדמתה בכתב ידה המקורי — כפי שמובאת כאן.</p>
+    </section>
+
+    <section class="book-preface" aria-label="ההקדמה בכתב ידה של חיה">
+      <h2>ההקדמה, בכתב ידה של חיה</h2>
+      <div class="preface-scans">
+        <a href={withBase('images/book-preface-p1.jpg')} target="_blank" rel="noopener" aria-label="פתחו את העמוד הראשון של ההקדמה בגודל מלא">
+          <img src={withBase('images/book-preface-p1.jpg')} alt="עמוד ראשון של ההקדמה בכתב ידה של חיה" loading="lazy" />
+        </a>
+        <a href={withBase('images/book-preface-p2.jpg')} target="_blank" rel="noopener" aria-label="פתחו את העמוד השני של ההקדמה בגודל מלא">
+          <img src={withBase('images/book-preface-p2.jpg')} alt="עמוד שני של ההקדמה בכתב ידה של חיה" loading="lazy" />
+        </a>
+      </div>
+      <p class="preface-hint">לחצו על התמונה לצפייה בהקדמה בגודל מלא.</p>
+    </section>
+
+    <p class="book-letters-link">ילדיה של חיה כתבו לזכרה מכתבים ושיר — <a href={withBase('letters')}>למכתבי המשפחה ←</a></p>
+
+    <section class="book-downloads" aria-label="להורדה">
+      <h2>הספר להורדה</h2>
+      <div class="book-download-card">
+        <img class="book-cover" src={withBase('images/book-cover.jpg')} alt="כריכת הספר 'חיה בסרט(ן)' מאת חיה קרפ-צור" loading="lazy" />
+        <div class="book-download-card__body">
+          <p>באומץ לב, ברגישות ובכנות מכמירת לב שוטחת הכותבת את הרהורי לבה וכן את החוויות שנקרו בדרכה בעל כורחה, עקב מחלת הסרטן שפקדה אותה.</p>
+          <p>הרשומות המובאות בספר זה הן לקט נבחר מתוך בלוג אינטרנטי שאותו ניהלה וקראה לו בהומור האופייני לה "חיה בסרט(ן)"</p>
+          <p>מקורן של רשומות אלה, באופטימיות הנדירה של הכותבת, אשר נלחמה במחלה בתעצומות נפש ובראש מורם וראתה בה סרט רע שיחלוף במהרה, ולאחריו תוכל לחזור ל"חייה הקודמים"</p>
+          <p>צאתו של ספר זה לאור הוא בבחינת הגשמת חלומה האחרון וציווי לחיים מלאים ונורמאליים – גם כשהגרוע מכל מרחף כענן עבד מעל.</p>
+          <p class="book-downloads__links">
+            <a href="https://github.com/yonatankarp/shahf11-blog/raw/main/book/haya-basrat-an-book.pdf">הורדת הספר המלא (PDF)</a>
+            <a href="https://github.com/yonatankarp/shahf11-blog/raw/main/book/meydaf-memorial-725.pdf">מידף לזכרה של חיה — גיליון הקהילה (PDF)</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="book-press" aria-label="כתבה על הספר">
+      <h2>בעיתונות</h2>
+      <div class="preface-scans">
+        <a href={withBase('images/news-shishi-bagolan-2012-p1.jpg')} target="_blank" rel="noopener" aria-label="פתחו את עמוד 1 של הכתבה בגודל מלא">
+          <img src={withBase('images/news-shishi-bagolan-2012-p1.jpg')} alt="כתבה על הספר 'חיה בסרט(ן)' — מוסף שישי בגולן, עמוד ראשון" loading="lazy" />
+        </a>
+        <a href={withBase('images/news-shishi-bagolan-2012-p2.jpg')} target="_blank" rel="noopener" aria-label="פתחו את עמוד 2 של הכתבה בגודל מלא">
+          <img src={withBase('images/news-shishi-bagolan-2012-p2.jpg')} alt="כתבה על הספר 'חיה בסרט(ן)' — מוסף שישי בגולן, עמוד שני" loading="lazy" />
+        </a>
+      </div>
+      <p class="preface-hint">כתבה על הספר — מוסף ״שישי בגולן״, ח׳ באב תשע״ב (27.7.2012). לחצו על התמונה לצפייה בגודל מלא.</p>
+    </section>
+  </article>
+</Base>

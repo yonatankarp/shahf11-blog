@@ -73,7 +73,7 @@ const galleryHtml = await readFile(path.join(distDir, 'gallery', 'index.html'), 
 const galleryImageCount = new Set(
   [...galleryHtml.matchAll(/<img\b[^>]*\bsrc=["']([^"']*\/gallery\/photos\/[^"']+)["']/gi)].map((match) => match[1]),
 ).size;
-if (galleryImageCount !== 54) failures.push(`gallery page expected 54 photos, found ${galleryImageCount}`);
+if (galleryImageCount !== 76) failures.push(`gallery page expected 76 photos, found ${galleryImageCount}`);
 for (const requiredClass of ['gallery-carousel', 'gallery-lightbox', 'data-gallery-index']) {
   if (!galleryHtml.includes(requiredClass)) failures.push(`gallery page missing ${requiredClass}`);
 }
