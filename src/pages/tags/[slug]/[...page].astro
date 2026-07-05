@@ -14,7 +14,10 @@ const { page, tag } = Astro.props;
 const pageHref = (n) => withBase(n === 1 ? `tags/${tag.id}` : `tags/${tag.id}/${n}`);
 const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
 ---
-<Base title={`${tag.label} — חיה בסרט(ן)`}>
+<Base
+  title={page.currentPage > 1 ? `${tag.label} · עמוד ${page.currentPage} — חיה בסרט(ן)` : `${tag.label} — חיה בסרט(ן)`}
+  description={`רשומות מהבלוג עם התגית ${tag.label}.`}
+>
   <div class="tag-page">
     <p class="eyebrow"><a href={withBase('tags')}>← כל התגיות</a></p>
     <h1 class="tag-page__title">{tag.label}</h1>

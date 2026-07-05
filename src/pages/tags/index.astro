@@ -12,7 +12,7 @@ const topics = tags.filter((t) => t.kind === 'topic').sort(byCount);
 const searchKey = (t: (typeof tags)[number]) =>
   [t.label, ...(t.aliases ?? []), t.id].join(' ').toLowerCase();
 ---
-<Base title="חיפוש ותגיות — חיה בסרט(ן)">
+<Base title="חיפוש ותגיות — חיה בסרט(ן)" description="חיפוש בכל רשומות הבלוג, ועיון לפי בני משפחה ונושאים.">
   <div class="tags-index">
     <h1 class="disp">חיפוש ותגיות</h1>
     <p class="eyebrow">חפשו כל מילה מהבלוג, או עיינו לפי בן משפחה ונושא</p>
