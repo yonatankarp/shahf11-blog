@@ -17,13 +17,18 @@ export async function getAdjacent(entryId: string) {
   };
 }
 
-export function excerpt(body: string, words = 30): string {
-  const text = body
+export function plainText(body: string): string {
+  return body
     .replace(/^\s*#[^\n]*\n+/, '') // drop the leading "# <title>" heading each post opens with
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '') // images
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1') // links: keep the text, drop the (url)
     .replace(/[#>*_`\[\]]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+export function excerpt(body: string, words = 30): string {
+  const text = plainText(body);
   const parts = text.split(' ');
   return parts.length <= words ? text : parts.slice(0, words).join(' ') + '…';
 }

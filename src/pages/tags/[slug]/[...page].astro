@@ -35,8 +35,8 @@ const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
         {pages.map((n) => (
           <li>
             {n === page.currentPage
-              ? <span class="pagination__page is-current" aria-current="page">{n}</span>
-              : <a class="pagination__page" href={pageHref(n)}>{n}</a>}
+              ? <span class="pagination__page is-current" aria-current="page" aria-label={`עמוד ${n}`}>{n}</span>
+              : <a class="pagination__page" href={pageHref(n)} aria-label={`עמוד ${n}`}>{n}</a>}
           </li>
         ))}
       </ol>
