@@ -16,7 +16,7 @@ const { newer, older } = await getAdjacent(post.data.entryId);
 const pdf = `https://github.com/yonatankarp/shahf11-blog/raw/main/posts-pdf/${post.id}.pdf`;
 const truncated = post.data.review.includes('scan-truncated');
 const inlineImgs = (post.body ?? '').match(/images\/[^\s)]+/g) ?? [];
-const extraImgs = post.data.images.filter((f) => !inlineImgs.some((s) => s.endsWith(f)));
+const extraImgs = post.data.images.filter((f) => !inlineImgs.some((s) => s === `images/${f}` || s.endsWith(`/${f}`)));
 const topic = (post.data.tags ?? []).map(getTag).find((t) => t.kind === 'topic');
 const description = excerpt(post.body ?? '');
 const jsonLd = JSON.stringify({
@@ -44,7 +44,7 @@ const jsonLd = JSON.stringify({
     )}
     {extraImgs.length > 0 && (
       <section class="gallery gallery--lead">
-        {extraImgs.map((f) => <img src={withBase(`images/${f}`)} alt={`תמונה מתוך "${post.data.title}"`} loading="lazy" />)}
+        {extraImgs.map((f) => <img src={withBase(`images/${f}`)} alt={`תמונה מתוך "${post.data.title}"`} loading="lazy" decoding="async" />)}
       </section>
     )}
     <div class="post__body"><Content /></div>
