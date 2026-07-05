@@ -42,7 +42,7 @@ try {
             ))}
             <button class="gallery-carousel__nav gallery-carousel__nav--prev" type="button" data-gallery-prev aria-label="התמונה הקודמת">‹</button>
             <button class="gallery-carousel__nav gallery-carousel__nav--next" type="button" data-gallery-next aria-label="התמונה הבאה">›</button>
-            <button class="gallery-carousel__toggle" type="button" data-gallery-toggle aria-pressed="false" aria-label="השהיית התחלופה האוטומטית">⏸</button>
+            <button class="gallery-carousel__toggle" type="button" data-gallery-toggle aria-pressed="false" aria-label="תחלופה אוטומטית">⏸</button>
           </div>
         </section>
 
@@ -115,12 +115,14 @@ try {
           };
 
           const updateToggle = () => {
-            toggleButton.setAttribute('aria-pressed', String(paused));
+            // The button's accessible name is the constant "תחלופה אוטומטית" (auto-advance);
+            // aria-pressed reflects whether that feature is currently on, i.e. !paused.
+            toggleButton.setAttribute('aria-pressed', String(!paused));
             toggleButton.textContent = paused ? '▶' : '⏸';
-            toggleButton.setAttribute('aria-label', paused ? 'הפעלת התחלופה האוטומטית' : 'השהיית התחלופה האוטומטית');
           };
 
           const openLightbox = (index) => {
+            stop();
             current = normalize(index);
             const photo = photos[current];
             lightboxImage.src = photo.full;
@@ -150,6 +152,9 @@ try {
           lightbox?.addEventListener('click', (event) => {
             if (event.target === lightbox) lightbox.close();
           });
+          // 'close' fires for the close button, backdrop click, and Escape alike;
+          // start() itself checks `paused`, so it won't resume if the user paused.
+          lightbox?.addEventListener('close', start);
           openers.forEach((button) => {
             button.addEventListener('click', () => openLightbox(Number(button.dataset.galleryIndex)));
           });
