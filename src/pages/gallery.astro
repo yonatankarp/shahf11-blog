@@ -31,19 +31,26 @@ try {
           <button class="gallery-carousel__nav gallery-carousel__nav--prev" type="button" data-gallery-prev aria-label="התמונה הקודמת">‹</button>
           <div class="gallery-carousel__track">
             {photos.map((p, index) => (
-              <button class:list={['gallery-carousel__slide', { 'is-active': index === 0 }]} type="button" data-gallery-index={index} aria-label="פתחו תמונה במסך מלא">
-                <img src={withBase(`gallery/photos/${p.file}`)} alt={p.alt ?? p.caption ?? ''} loading={index === 0 ? 'eager' : 'lazy'} />
+              <button class:list={['gallery-carousel__slide', { 'is-active': index === 0 }]} type="button" data-gallery-index={index} aria-label={`פתחו תמונה ${index + 1} מתוך ${photos.length} במסך מלא`}>
+                <img
+                  src={index === 0 ? withBase(`gallery/photos/${p.file}`) : undefined}
+                  data-src={index === 0 ? undefined : withBase(`gallery/photos/${p.file}`)}
+                  alt={p.alt ?? p.caption ?? ''}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
               </button>
             ))}
           </div>
           <button class="gallery-carousel__nav gallery-carousel__nav--next" type="button" data-gallery-next aria-label="התמונה הבאה">›</button>
+          <button class="gallery-carousel__toggle" type="button" data-gallery-toggle aria-pressed="false" aria-label="השהיית התחלופה האוטומטית">⏸</button>
         </section>
 
         <div class="gallery-grid">
           {photos.map((p, index) => (
             <figure>
-              <button type="button" class="gallery-thumb" data-gallery-index={index} aria-label="פתחו תמונה במסך מלא">
-                <img src={withBase(`gallery/photos/${p.file}`)} alt={p.alt ?? p.caption ?? ''} loading="lazy" />
+              <button type="button" class="gallery-thumb" data-gallery-index={index} aria-label={`פתחו תמונה ${index + 1} מתוך ${photos.length} במסך מלא`}>
+                <img src={withBase(`gallery/thumbs/${p.file}`)} alt={p.alt ?? p.caption ?? ''} loading="lazy" decoding="async" />
               </button>
               {p.caption && <figcaption>{p.caption}</figcaption>}
             </figure>
@@ -60,11 +67,13 @@ try {
           <button class="gallery-lightbox__nav gallery-lightbox__nav--next" type="button" data-lightbox-next aria-label="התמונה הבאה">›</button>
         </dialog>
 
-        <script define:vars={{ photos: photos.map((p) => ({ src: withBase(`gallery/photos/${p.file}`), alt: p.alt ?? p.caption ?? '', caption: p.caption ?? '' })) }}>
+        <script define:vars={{ photos: photos.map((p) => ({ full: withBase(`gallery/photos/${p.file}`), alt: p.alt ?? p.caption ?? '', caption: p.caption ?? '' })) }}>
+          const carousel = document.querySelector('[data-gallery-carousel]');
           const slides = [...document.querySelectorAll('[data-gallery-carousel] [data-gallery-index]')];
           const openers = [...document.querySelectorAll('[data-gallery-index]')];
           const prevButton = document.querySelector('[data-gallery-prev]');
           const nextButton = document.querySelector('[data-gallery-next]');
+          const toggleButton = document.querySelector('[data-gallery-toggle]');
           const lightbox = document.querySelector('[data-gallery-lightbox]');
           const lightboxImage = document.querySelector('[data-lightbox-image]');
           const lightboxCaption = document.querySelector('[data-lightbox-caption]');
@@ -74,11 +83,19 @@ try {
           const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
           let current = 0;
           let timer;
+          let paused = prefersReducedMotion;
 
           const normalize = (index) => (index + photos.length) % photos.length;
 
+          const hydrate = (index) => {
+            const img = slides[normalize(index)]?.querySelector('img');
+            if (img && !img.src && img.dataset.src) img.src = img.dataset.src;
+          };
+
           const showSlide = (index) => {
             current = normalize(index);
+            hydrate(current);
+            hydrate(current + 1); // prefetch the next slide
             slides.forEach((slide, slideIndex) => {
               slide.classList.toggle('is-active', slideIndex === current);
             });
@@ -86,29 +103,47 @@ try {
 
           const move = (step) => showSlide(current + step);
 
+          const stop = () => {
+            if (timer) window.clearInterval(timer);
+            timer = undefined;
+          };
+
           const start = () => {
-            if (prefersReducedMotion || photos.length < 2) return;
+            if (paused || photos.length < 2) return;
             stop();
             timer = window.setInterval(() => move(1), 5000);
           };
 
-          const stop = () => {
-            if (timer) window.clearInterval(timer);
+          const updateToggle = () => {
+            toggleButton.setAttribute('aria-pressed', String(paused));
+            toggleButton.textContent = paused ? '▶' : '⏸';
+            toggleButton.setAttribute('aria-label', paused ? 'הפעלת התחלופה האוטומטית' : 'השהיית התחלופה האוטומטית');
           };
 
           const openLightbox = (index) => {
             current = normalize(index);
             const photo = photos[current];
-            lightboxImage.src = photo.src;
+            lightboxImage.src = photo.full;
             lightboxImage.alt = photo.alt;
             lightboxCaption.textContent = photo.caption;
             lightboxCaption.hidden = !photo.caption;
-            if (typeof lightbox.showModal === 'function') lightbox.showModal();
-            else lightbox.setAttribute('open', '');
+            if (!lightbox.open) {
+              if (typeof lightbox.showModal === 'function') lightbox.showModal();
+              else lightbox.setAttribute('open', '');
+            }
           };
 
           prevButton?.addEventListener('click', () => { move(-1); start(); });
           nextButton?.addEventListener('click', () => { move(1); start(); });
+          toggleButton?.addEventListener('click', () => {
+            paused = !paused;
+            paused ? stop() : start();
+            updateToggle();
+          });
+          carousel?.addEventListener('mouseenter', stop);
+          carousel?.addEventListener('mouseleave', start);
+          carousel?.addEventListener('focusin', stop);
+          carousel?.addEventListener('focusout', start);
           lightboxPrev?.addEventListener('click', () => openLightbox(current - 1));
           lightboxNext?.addEventListener('click', () => openLightbox(current + 1));
           closeButton?.addEventListener('click', () => lightbox.close());
@@ -123,6 +158,7 @@ try {
             if (event.key === 'ArrowLeft') openLightbox(current + 1);
             if (event.key === 'ArrowRight') openLightbox(current - 1);
           });
+          updateToggle();
           start();
         </script>
       </>

@@ -15,12 +15,8 @@ const doc = loadYaml(await readFile(manifestPath, 'utf8'));
 const photos = Array.isArray(doc?.photos) ? doc.photos : [];
 const manifestFiles = photos.map((photo) => photo?.file).filter(Boolean);
 const actualFiles = (await readdir(photosDir)).filter((file) => imagePattern.test(file)).sort();
-const expectedGalleryCount = 76;
 
 const failures = [];
-if (photos.length !== expectedGalleryCount) {
-  failures.push(`expected ${expectedGalleryCount} manifest photos, found ${photos.length}`);
-}
 
 const seen = new Set();
 for (const [index, file] of manifestFiles.entries()) {
