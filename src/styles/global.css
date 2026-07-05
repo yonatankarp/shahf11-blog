@@ -202,7 +202,8 @@ a.cat:hover { filter: brightness(1.1); }
 /* lead image(s) at the top of a post, as in the originals */
 .gallery--lead { margin-block-start: 1.4rem; }
 .gallery--lead img:first-child { margin-block-start: 0; }
-.post__pdf { font-family: var(--sans); font-size: .9rem; margin-block-start: 2rem; }
+.post-download { margin-block-start: 2.5rem; }
+.post-download .book-downloads__links { margin-block-start: 0; }
 .post__tags { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; margin-block-start: 1.8rem; padding-block-start: 1.4rem; border-block-start: 1px solid var(--line); }
 .post__tags .eyebrow { font-size: .76rem; }
 .post-nav {
