@@ -274,7 +274,7 @@ a.cat:hover { filter: brightness(1.1); }
   position: relative; margin-block-start: 1.8rem; min-block-size: clamp(17rem, 54vw, 38rem);
   display: grid; align-items: center;
 }
-.gallery-carousel__track { position: relative; min-block-size: inherit; overflow: hidden; border-radius: 8px; background: var(--panel); max-inline-size: 46rem; margin-inline: auto; }
+.gallery-carousel__track { position: relative; min-block-size: inherit; overflow: hidden; border-radius: 8px; background: var(--panel); inline-size: min(100%, 46rem); justify-self: center; }
 .gallery-carousel__slide {
   position: absolute; inset: 0; inline-size: 100%; block-size: 100%; opacity: 0;
   visibility: hidden;
