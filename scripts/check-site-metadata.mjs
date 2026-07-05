@@ -7,7 +7,9 @@
 //      via both src and deferred data-src attributes — this is what
 //      rewriteImageBase + withBase produce; a miss ships broken images
 //   4. each referenced image file actually exists in dist/
-//   5. post pages were generated
+//   5. every <a> pointing at posts-pdf/ or book/ is base-prefixed and the PDF
+//      file actually exists in dist/
+//   6. post pages were generated
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -36,6 +38,7 @@ async function htmlFiles(dir) {
 const failures = [];
 const files = await htmlFiles(distDir);
 let imgCount = 0;
+let pdfCount = 0;
 
 for (const file of files) {
   const html = await readFile(file, 'utf8');
@@ -60,6 +63,19 @@ for (const file of files) {
     // BASE is a URL prefix, not a dist subdirectory — files live at dist/images/.
     if (!existsSync(path.join(distDir, src.slice(BASE.length + 1)))) {
       failures.push(`${rel}: image file missing in dist: ${src}`);
+    }
+  }
+
+  for (const m of html.matchAll(/<a\b[^>]*\bhref=["']([^"']+\.pdf)["']/gi)) {
+    const href = m[1];
+    if (!href.includes('/posts-pdf/') && !href.includes('/book/')) continue;
+    pdfCount += 1;
+    if (!href.startsWith(`${BASE}/`)) {
+      failures.push(`${rel}: pdf link not base-prefixed: ${href}`);
+      continue;
+    }
+    if (!existsSync(path.join(distDir, href.slice(BASE.length + 1)))) {
+      failures.push(`${rel}: pdf file missing in dist: ${href}`);
     }
   }
 }
@@ -88,5 +104,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs base-prefixed and present.`,
+  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs and ${pdfCount} pdf links base-prefixed and present.`,
 );

@@ -17,10 +17,12 @@ async function syncResized(srcDir, destDir, maxWidth, dims) {
   await mkdir(destDir, { recursive: true });
   const srcNames = await readdir(srcDir);
   for (const name of await readdir(destDir)) {
+    if (name.startsWith('.')) continue;
     if (!srcNames.includes(name)) await rm(path.join(destDir, name), { recursive: true });
   }
   let converted = 0;
   for (const name of srcNames) {
+    if (name.startsWith('.')) continue;
     const src = path.join(srcDir, name);
     const dest = path.join(destDir, name);
     if ((await stat(src)).isDirectory()) continue;

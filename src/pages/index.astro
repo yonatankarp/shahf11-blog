@@ -26,7 +26,7 @@ const jsonLd = JSON.stringify({
   url: new URL(withBase(''), Astro.site).href,
   inLanguage: 'he',
   author: { '@type': 'Person', name: 'חיה קרפ-צור' },
-});
+}).replace(/</g, '\\u003c');
 ---
 <Base
   title="חיה בסרט(ן) — בלוג הזיכרון של חיה"

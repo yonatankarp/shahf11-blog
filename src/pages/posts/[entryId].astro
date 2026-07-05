@@ -27,7 +27,7 @@ const jsonLd = JSON.stringify({
   inLanguage: 'he',
   author: { '@type': 'Person', name: 'חיה קרפ-צור' },
   url: new URL(`${Astro.url.pathname.replace(/\/$/, '')}/`, Astro.site).href,
-});
+}).replace(/</g, '\\u003c');
 ---
 <Base title={`${post.data.title} — חיה בסרט(ן)`} description={description} ogType="article">
   <script type="application/ld+json" set:html={jsonLd} is:inline slot="head" />
