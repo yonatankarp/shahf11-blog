@@ -1,11 +1,10 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
 import Base from '../layouts/Base.astro';
 import PostCard from '../components/PostCard.astro';
 import { getAllPosts } from '../lib/posts';
 import { HIGHLIGHTS } from '../data/highlights';
 import { withBase } from '../lib/url';
+import { heroPhotoFile } from '../lib/hero';
 
 const posts = await getAllPosts(); // oldest-first
 const oldest = posts[0];
@@ -15,12 +14,8 @@ const total = posts.length;
 const byId = new Map(posts.map((p) => [p.data.entryId, p]));
 const highlights = HIGHLIGHTS.map((id) => byId.get(id)).filter(Boolean);
 
-// A face portrait of Haya for the hero circle. To swap it, add the new photo to public/
-// under a NEW filename and put that name first here — reusing an old filename leaves
-// visitors' browser caches serving the previous photo inside the new layout.
-const PUB = path.join(process.cwd(), 'public');
-const photoFile = ['haya-face.jpg', 'haya.jpg', 'haya.jpeg', 'haya.png', 'haya.webp'].find((f) => fs.existsSync(path.join(PUB, f)));
-const heroPhoto = photoFile ? withBase(photoFile) : null;
+// A face portrait of Haya for the hero circle — see src/lib/hero.ts for how to swap it.
+const heroPhoto = heroPhotoFile ? withBase(heroPhotoFile) : null;
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'Blog',
@@ -38,7 +33,7 @@ const jsonLd = JSON.stringify({
   <script type="application/ld+json" set:html={jsonLd} is:inline slot="head" />
   <section class="home-hero">
     <p class="home-hero__eyebrow">בלוג הזיכרון של חיה</p>
-    {heroPhoto && <img class="home-hero__photo" src={heroPhoto} alt="חיה" width="295" height="295" />}
+    {heroPhoto && <img class="home-hero__photo" src={heroPhoto} alt="חיה" width="600" height="600" />}
     <h1 class="home-hero__title">חיה בסרט<span class="paren">(ן)</span></h1>
     <p class="home-hero__quote">הסרט שלי השנה: סרטן השד. האמונה שלי: השד לא נורא כל כך.</p>
     <p class="home-hero__ded">
