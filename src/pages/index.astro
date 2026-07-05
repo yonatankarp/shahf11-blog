@@ -15,9 +15,7 @@ const total = posts.length;
 const byId = new Map(posts.map((p) => [p.data.entryId, p]));
 const highlights = HIGHLIGHTS.map((id) => byId.get(id)).filter(Boolean);
 
-// A portrait of Haya for the hero + film poster. Just drop a photo into public/ named
-// haya.jpg (or .jpeg/.png/.webp) — it lights up automatically, no code change. Until then
-// the hero stays purely typographic.
+// A portrait of Haya for the hero (public/haya.jpg — swap the file to change it, no code change).
 const PUB = path.join(process.cwd(), 'public');
 const photoFile = ['haya.jpg', 'haya.jpeg', 'haya.png', 'haya.webp'].find((f) => fs.existsSync(path.join(PUB, f)));
 const heroPhoto = photoFile ? withBase(photoFile) : null;
@@ -37,7 +35,7 @@ const jsonLd = JSON.stringify({
   <script type="application/ld+json" set:html={jsonLd} is:inline slot="head" />
   <section class="home-hero">
     <p class="home-hero__eyebrow">בלוג הזיכרון של חיה</p>
-    {heroPhoto && <img class="home-hero__photo" src={heroPhoto} alt="חיה" width="180" height="180" />}
+    {heroPhoto && <img class="home-hero__photo" src={heroPhoto} alt="חיה, בתמונה משפחתית" width="640" height="480" />}
     <h1 class="home-hero__title">חיה בסרט<span class="paren">(ן)</span></h1>
     <p class="home-hero__quote">הסרט שלי השנה: סרטן השד. האמונה שלי: השד לא נורא כל כך.</p>
     <p class="home-hero__ded">
@@ -57,7 +55,7 @@ const jsonLd = JSON.stringify({
   <section class="home-film">
     <div class="feed__head"><h2 class="disp">הסרט שלה</h2></div>
     <figure class="film">
-      <video class="film__video" controls preload="metadata" poster={heroPhoto ?? undefined}>
+      <video class="film__video" controls preload="metadata" aria-label="״חיה בסרט(ן)״ — סרט גמר, יוני 2009">
         <source src={withBase('video/graduation-film-2009.mp4')} type="video/mp4" />
         הדפדפן שלך אינו תומך בהפעלת וידאו.
       </video>
