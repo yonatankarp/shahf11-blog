@@ -54,7 +54,15 @@ const jsonLd = JSON.stringify({
         <TagChips tags={post.data.tags} />
       </section>
     )}
-    <p class="post__pdf"><a href={pdf}>הורדת הסריקה המקורית (PDF)</a></p>
+    <section class="post-download" aria-label="הורדה">
+      <div class="book-download-card">
+        <div class="book-download-card__body">
+          <p class="book-downloads__links">
+            <a href={pdf}>הורדת הסריקה המקורית (PDF)</a>
+          </p>
+        </div>
+      </div>
+    </section>
     <nav class="post-nav" aria-label="ניווט בין רשומות">
       {older ? <a href={withBase(`posts/${older.data.entryId}`)}>← {older.data.title}</a> : <span />}
       {newer ? <a href={withBase(`posts/${newer.data.entryId}`)}>{newer.data.title} →</a> : <span />}
