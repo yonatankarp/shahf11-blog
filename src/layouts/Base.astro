@@ -16,6 +16,7 @@ const ogImageUrl = new URL(ogImage ?? withBase('haya.jpg'), Astro.site);
 const isActive = (href) => {
   const clean = withBase(href).replace(/\/$/, '');
   if (href === '/') return path === clean || path === withBase('').replace(/\/$/, '');
+  if (href === 'blog' && path.startsWith(withBase('posts').replace(/\/$/, '') + '/')) return true;
   return path === clean || path.startsWith(clean + '/');
 };
 const nav = [

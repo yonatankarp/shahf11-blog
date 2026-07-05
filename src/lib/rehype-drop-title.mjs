@@ -1,11 +1,11 @@
 // Every reconstructed post body begins with an `# <title>` H1 that duplicates the
-// frontmatter title — which each page already renders on its own. Drop that leading
-// H1 so the title isn't shown twice. Only the first top-level H1 is removed; any later
-// H1 in the body is left intact.
+// frontmatter title — which each page already renders on its own. Drop that H1 only
+// when it is the first element in the body; an H1 that appears after other content
+// is a legitimate section heading and stays.
 export function dropTitleH1() {
   return (tree) => {
     const children = tree.children ?? [];
-    const i = children.findIndex((n) => n.type === 'element' && n.tagName === 'h1');
-    if (i !== -1) children.splice(i, 1);
+    const first = children.find((n) => n.type === 'element');
+    if (first?.tagName === 'h1') children.splice(children.indexOf(first), 1);
   };
 }
