@@ -32,6 +32,7 @@
 | `src/pages/blog/[...page].astro` | 3, 8 |
 | `src/pages/tags/index.astro` | 3, 8 |
 | `src/pages/about.astro`, `src/pages/index.astro` | 3, 4 |
+| `src/pages/letters.astro` | 3 (read-first; needed no change) |
 | `public/haya.jpg` | 4 |
 | `scripts/copy-images.mjs` | 5 |
 | `src/pages/gallery.astro` | 5 |

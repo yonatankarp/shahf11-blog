@@ -110,6 +110,7 @@ try {
 
           const start = () => {
             if (paused || lightbox?.open || photos.length < 2) return;
+            if (carousel?.contains(document.activeElement)) return; // focus-within means paused
             stop();
             timer = window.setInterval(() => move(1), 5000);
           };
