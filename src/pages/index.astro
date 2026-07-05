@@ -15,9 +15,11 @@ const total = posts.length;
 const byId = new Map(posts.map((p) => [p.data.entryId, p]));
 const highlights = HIGHLIGHTS.map((id) => byId.get(id)).filter(Boolean);
 
-// A portrait of Haya for the hero (public/haya.jpg — swap the file to change it, no code change).
+// A face portrait of Haya for the hero circle. To swap it, add the new photo to public/
+// under a NEW filename and put that name first here — reusing an old filename leaves
+// visitors' browser caches serving the previous photo inside the new layout.
 const PUB = path.join(process.cwd(), 'public');
-const photoFile = ['haya.jpg', 'haya.jpeg', 'haya.png', 'haya.webp'].find((f) => fs.existsSync(path.join(PUB, f)));
+const photoFile = ['haya-face.jpg', 'haya.jpg', 'haya.jpeg', 'haya.png', 'haya.webp'].find((f) => fs.existsSync(path.join(PUB, f)));
 const heroPhoto = photoFile ? withBase(photoFile) : null;
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
@@ -36,7 +38,7 @@ const jsonLd = JSON.stringify({
   <script type="application/ld+json" set:html={jsonLd} is:inline slot="head" />
   <section class="home-hero">
     <p class="home-hero__eyebrow">בלוג הזיכרון של חיה</p>
-    {heroPhoto && <img class="home-hero__photo" src={heroPhoto} alt="חיה" width="260" height="260" />}
+    {heroPhoto && <img class="home-hero__photo" src={heroPhoto} alt="חיה" width="295" height="295" />}
     <h1 class="home-hero__title">חיה בסרט<span class="paren">(ן)</span></h1>
     <p class="home-hero__quote">הסרט שלי השנה: סרטן השד. האמונה שלי: השד לא נורא כל כך.</p>
     <p class="home-hero__ded">

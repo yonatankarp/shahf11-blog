@@ -13,7 +13,7 @@ const path = Astro.url.pathname.replace(/\/$/, '');
 const canonicalPath = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
 const canonical = new URL(canonicalPath, Astro.site);
 // ogImage, when passed, must already be base-prefixed (e.g. withBase() output) — it's resolved against Astro.site here, not re-prefixed.
-const ogImageUrl = new URL(ogImage ?? withBase('haya.jpg'), Astro.site);
+const ogImageUrl = new URL(ogImage ?? withBase('haya-face.jpg'), Astro.site);
 const isActive = (href) => {
   const clean = withBase(href).replace(/\/$/, '');
   if (href === '/') return path === clean || path === withBase('').replace(/\/$/, '');
