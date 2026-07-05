@@ -1,13 +1,18 @@
 ---
 import '@fontsource-variable/frank-ruhl-libre';
 import '@fontsource-variable/assistant';
-import '@fontsource/secular-one/400.css';
 import '@fontsource/gveret-levin/400.css';
 import '@fontsource/heebo/700.css';
 import '../styles/global.css';
+import frankHebrewWoff2 from '@fontsource-variable/frank-ruhl-libre/files/frank-ruhl-libre-hebrew-wght-normal.woff2?url';
+import gveretHebrewWoff2 from '@fontsource/gveret-levin/files/gveret-levin-hebrew-400-normal.woff2?url';
 import { withBase } from '../lib/url';
-const { title, description, wide = false } = Astro.props;
+const { title, description, wide = false, ogType = 'website', ogImage } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '');
+// Canonical/og URLs must be absolute — WhatsApp/Facebook won't fetch root-relative ones.
+const canonicalPath = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonical = new URL(canonicalPath, Astro.site);
+const ogImageUrl = new URL(ogImage ?? withBase('haya.jpg'), Astro.site);
 const isActive = (href) => {
   const clean = withBase(href).replace(/\/$/, '');
   if (href === '/') return path === clean || path === withBase('').replace(/\/$/, '');
@@ -30,6 +35,21 @@ const nav = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+    <meta name="theme-color" content="#f7efe3" />
+    <link rel="canonical" href={canonical} />
+    <link rel="sitemap" href={withBase('sitemap-index.xml')} />
+    <link rel="preload" as="font" type="font/woff2" href={frankHebrewWoff2} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={gveretHebrewWoff2} crossorigin />
+    <meta property="og:title" content={title} />
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="חיה בסרט(ן)" />
+    <meta property="og:locale" content="he_IL" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <slot name="head" />
   </head>
   <body>
     <a class="skip-link" href="#main">דלגו לתוכן</a>
