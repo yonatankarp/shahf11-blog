@@ -13,7 +13,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const { newer, older } = await getAdjacent(post.data.entryId);
-const pdf = `https://github.com/yonatankarp/shahf11-blog/raw/main/posts-pdf/${post.id}.pdf`;
+const pdf = withBase(`posts-pdf/${post.id}.pdf`);
 const truncated = post.data.review.includes('scan-truncated');
 const inlineImgs = (post.body ?? '').match(/images\/[^\s)]+/g) ?? [];
 const extraImgs = post.data.images.filter((f) => !inlineImgs.some((s) => s === `images/${f}` || s.endsWith(`/${f}`)));
