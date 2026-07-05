@@ -86,6 +86,7 @@ const searchKey = (t: (typeof tags)[number]) =>
       const idx = await ensureIndex();
       const matches = idx.filter((p) => p.text.includes(q));
       const shown = matches.slice(0, 50);
+      results.hidden = false;
       countEl.textContent = matches.length
         ? `${matches.length} רשומות שמזכירות ״${input.value.trim()}״`
         : `לא נמצאו רשומות עבור ״${input.value.trim()}״`;
@@ -94,9 +95,12 @@ const searchKey = (t: (typeof tags)[number]) =>
         `<span class="search-hit__date">${esc(p.date)}</span>` +
         `<p class="search-hit__ex">${esc(p.excerpt)}</p></li>`).join('') +
         (matches.length > shown.length ? `<li class="search-hit__more">מוצגות ${shown.length} מתוך ${matches.length}. צמצמו את החיפוש.</li>` : '');
-      results.hidden = false;
     }
 
-    input?.addEventListener('input', run);
+    let debounceTimer;
+    input?.addEventListener('input', () => {
+      window.clearTimeout(debounceTimer);
+      debounceTimer = window.setTimeout(run, 150);
+    });
   </script>
 </Base>

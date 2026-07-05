@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getAllPosts, excerpt } from '../lib/posts';
+import { getAllPosts, excerpt, plainText } from '../lib/posts';
 import { tagsForPost } from '../lib/tags';
 import { withBase } from '../lib/url';
 
@@ -14,12 +14,7 @@ export const GET: APIRoute = async () => {
     const tagText = tagsForPost(p)
       .flatMap((t) => (t.kind === 'person' ? [t.label, ...(t.aliases ?? [])] : [t.label]))
       .join(' ');
-    const body = (p.body ?? '')
-      .replace(/^\s*#[^\n]*\n+/, '') // leading "# title"
-      .replace(/!\[[^\]]*\]\([^)]*\)/g, '') // images
-      .replace(/[#>*_`\[\]]/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
+    const body = plainText(p.body ?? '');
     return {
       title: p.data.title,
       date: p.data.date_published,

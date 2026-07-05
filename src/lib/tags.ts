@@ -13,18 +13,13 @@ export function tagsForPost(post: PostEntry): TagDef[] {
   return (post.data.tags ?? []).map(getTag);
 }
 
-export async function postsForTag(id: string): Promise<PostEntry[]> {
-  const posts = await getAllPosts(); // newest-first
-  return posts.filter((p) => (p.data.tags ?? []).includes(id));
-}
-
 export interface TagWithPosts extends TagDef {
   posts: PostEntry[];
   count: number;
 }
 
 // Every tag that appears on at least one post, in registry order (people before topics),
-// each carrying its posts (newest-first). Unused registry tags are omitted.
+// each carrying its posts (oldest-first). Unused registry tags are omitted.
 export async function allTagsWithCounts(): Promise<TagWithPosts[]> {
   const posts = await getAllPosts();
   const groups = new Map<string, PostEntry[]>();
@@ -48,12 +43,4 @@ export async function allTagsWithCounts(): Promise<TagWithPosts[]> {
     result.push({ ...getTag(id), posts: ps, count: ps.length });
   }
   return result;
-}
-
-// Exact-match lookup by label or alias — handy for programmatic resolution.
-export function findTag(query: string): TagDef | undefined {
-  const q = query.trim().toLowerCase();
-  return TAGS.find(
-    (t) => t.label.toLowerCase() === q || (t.aliases ?? []).some((a) => a.toLowerCase() === q),
-  );
 }
