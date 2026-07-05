@@ -337,12 +337,14 @@ h1, h2, h3 { line-height: 1.25; text-wrap: balance; }
 .book-genesis { line-height: 1.9; margin: 1.5rem 0 2.5rem; }
 .preface-scans { display: grid; gap: 1rem; grid-template-columns: 1fr; }
 @media (min-width: 720px) { .preface-scans { grid-template-columns: 1fr 1fr; } }
+.preface-scans a { display: block; }
 .preface-scans img { width: 100%; height: auto; border: 1px solid rgba(0,0,0,.1); border-radius: 4px; }
-.preface-transcript { margin-top: 1.5rem; line-height: 1.9; }
-.preface-transcript__label { font-size: .85rem; opacity: .7; letter-spacing: .02em; }
+.preface-hint { margin-top: .75rem; font-size: .85rem; opacity: .7; }
+.book-letters-link { margin: 2rem 0; line-height: 1.9; }
+.book-letters-intro { margin-bottom: 2rem; line-height: 1.9; opacity: .85; }
 .book-letters { margin-top: 3rem; }
 .letter { margin: 2.5rem 0; line-height: 1.9; }
-.letter h3 { margin-bottom: .75rem; }
+.letter :is(h2, h3) { margin-bottom: .75rem; }
 .letter--poem { text-align: center; font-style: italic; white-space: normal; }
 .letter--poem p { margin: 1rem 0; }
 .book-downloads { margin-top: 3rem; }
