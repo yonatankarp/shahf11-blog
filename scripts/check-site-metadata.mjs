@@ -4,8 +4,8 @@
 //   1. every page keeps <html lang="he" dir="rtl"> (RTL is core to this blog)
 //   2. every page has a non-empty <title>
 //   3. every local <img> pointing at images/ or gallery/photos/ is base-prefixed
-//      — this is what rewriteImageBase + withBase produce; a miss ships broken
-//      images that still build fine
+//      via both src and deferred data-src attributes — this is what
+//      rewriteImageBase + withBase produce; a miss ships broken images
 //   4. each referenced image file actually exists in dist/
 //   5. post pages were generated
 import { readdir, readFile } from 'node:fs/promises';
@@ -49,7 +49,7 @@ for (const file of files) {
   const title = html.match(/<title>([\s\S]*?)<\/title>/i);
   if (!title || !title[1].trim()) failures.push(`${rel}: empty or missing <title>`);
 
-  for (const m of html.matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["']/gi)) {
+  for (const m of html.matchAll(/<img\b[^>]*\s(?:data-)?src=["']([^"']+)["']/gi)) {
     const src = m[1];
     if (!/(?:^|\/|\.\.\/)(?:images|gallery\/(?:photos|thumbs))\//.test(src)) continue;
     imgCount += 1;
