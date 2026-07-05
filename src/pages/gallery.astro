@@ -109,7 +109,7 @@ try {
           };
 
           const start = () => {
-            if (paused || photos.length < 2) return;
+            if (paused || lightbox?.open || photos.length < 2) return;
             stop();
             timer = window.setInterval(() => move(1), 5000);
           };
