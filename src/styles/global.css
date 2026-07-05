@@ -105,8 +105,8 @@ a { color: var(--red); text-underline-offset: .16em; text-decoration-thickness: 
 .home-cta:hover { filter: brightness(1.08); }
 .home-recent { border-block-start: 1px solid var(--line); }
 .home-hero__photo {
-  display: block; inline-size: min(100%, 22rem); aspect-ratio: 4 / 3; object-fit: cover;
-  border-radius: 8px; margin: 0 auto 1.4rem; background: var(--panel);
+  display: block; inline-size: min(100%, 13rem); aspect-ratio: 1 / 1; object-fit: cover;
+  border-radius: 50%; margin: 0 auto 1.4rem; background: var(--panel);
   border: 3px solid var(--panel); box-shadow: 0 8px 28px -12px rgba(0,0,0,.4);
 }
 

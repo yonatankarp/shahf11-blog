@@ -7,13 +7,15 @@ import '../styles/global.css';
 import frankHebrewWoff2 from '@fontsource-variable/frank-ruhl-libre/files/frank-ruhl-libre-hebrew-wght-normal.woff2?url';
 import gveretHebrewWoff2 from '@fontsource/gveret-levin/files/gveret-levin-hebrew-400-normal.woff2?url';
 import { withBase } from '../lib/url';
+import { heroPhotoFile } from '../lib/hero';
 const { title, description, wide = false, ogType = 'website', ogImage } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, '');
 // Canonical/og URLs must be absolute — WhatsApp/Facebook won't fetch root-relative ones.
 const canonicalPath = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
 const canonical = new URL(canonicalPath, Astro.site);
 // ogImage, when passed, must already be base-prefixed (e.g. withBase() output) — it's resolved against Astro.site here, not re-prefixed.
-const ogImageUrl = new URL(ogImage ?? withBase('haya.jpg'), Astro.site);
+// Default: the hero portrait (src/lib/hero.ts), so the og:image can never point at a deleted file.
+const ogImageUrl = heroPhotoFile || ogImage ? new URL(ogImage ?? withBase(heroPhotoFile), Astro.site) : null;
 const isActive = (href) => {
   const clean = withBase(href).replace(/\/$/, '');
   if (href === '/') return path === clean || path === withBase('').replace(/\/$/, '');
@@ -49,7 +51,7 @@ const nav = [
     <meta property="og:site_name" content="חיה בסרט(ן)" />
     <meta property="og:locale" content="he_IL" />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImageUrl} />
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
     <meta name="twitter:card" content="summary_large_image" />
     <slot name="head" />
   </head>
