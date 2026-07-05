@@ -28,7 +28,6 @@ try {
     ) : (
       <>
         <section class="gallery-carousel" aria-label="תמונות נבחרות" data-gallery-carousel>
-          <button class="gallery-carousel__nav gallery-carousel__nav--prev" type="button" data-gallery-prev aria-label="התמונה הקודמת">‹</button>
           <div class="gallery-carousel__track">
             {photos.map((p, index) => (
               <button class:list={['gallery-carousel__slide', { 'is-active': index === 0 }]} type="button" data-gallery-index={index} aria-label={`פתחו תמונה ${index + 1} מתוך ${photos.length} במסך מלא`}>
@@ -41,9 +40,10 @@ try {
                 />
               </button>
             ))}
+            <button class="gallery-carousel__nav gallery-carousel__nav--prev" type="button" data-gallery-prev aria-label="התמונה הקודמת">‹</button>
+            <button class="gallery-carousel__nav gallery-carousel__nav--next" type="button" data-gallery-next aria-label="התמונה הבאה">›</button>
+            <button class="gallery-carousel__toggle" type="button" data-gallery-toggle aria-pressed="false" aria-label="השהיית התחלופה האוטומטית">⏸</button>
           </div>
-          <button class="gallery-carousel__nav gallery-carousel__nav--next" type="button" data-gallery-next aria-label="התמונה הבאה">›</button>
-          <button class="gallery-carousel__toggle" type="button" data-gallery-toggle aria-pressed="false" aria-label="השהיית התחלופה האוטומטית">⏸</button>
         </section>
 
         <div class="gallery-grid">
