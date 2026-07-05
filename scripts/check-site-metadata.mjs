@@ -12,6 +12,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { load as loadYaml } from 'js-yaml';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = path.join(rootDir, 'dist');
@@ -50,7 +51,7 @@ for (const file of files) {
 
   for (const m of html.matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["']/gi)) {
     const src = m[1];
-    if (!/(?:^|\/|\.\.\/)(?:images|gallery\/photos)\//.test(src)) continue;
+    if (!/(?:^|\/|\.\.\/)(?:images|gallery\/(?:photos|thumbs))\//.test(src)) continue;
     imgCount += 1;
     if (!src.startsWith(`${BASE}/`)) {
       failures.push(`${rel}: image src not base-prefixed: ${src}`);
@@ -69,11 +70,13 @@ const postCount = existsSync(postsDir)
   : 0;
 if (postCount < 1) failures.push('no post pages generated under dist/posts/');
 
+const manifest = loadYaml(await readFile(path.join(rootDir, 'gallery', 'photos.yaml'), 'utf8'));
+const expectedPhotos = Array.isArray(manifest?.photos) ? manifest.photos.length : 0;
 const galleryHtml = await readFile(path.join(distDir, 'gallery', 'index.html'), 'utf8');
 const galleryImageCount = new Set(
-  [...galleryHtml.matchAll(/<img\b[^>]*\bsrc=["']([^"']*\/gallery\/photos\/[^"']+)["']/gi)].map((match) => match[1]),
+  [...galleryHtml.matchAll(/<img\b[^>]*\bsrc=["']([^"']*\/gallery\/thumbs\/[^"']+)["']/gi)].map((m) => m[1]),
 ).size;
-if (galleryImageCount !== 76) failures.push(`gallery page expected 76 photos, found ${galleryImageCount}`);
+if (galleryImageCount !== expectedPhotos) failures.push(`gallery page expected ${expectedPhotos} photos, found ${galleryImageCount}`);
 for (const requiredClass of ['gallery-carousel', 'gallery-lightbox', 'data-gallery-index']) {
   if (!galleryHtml.includes(requiredClass)) failures.push(`gallery page missing ${requiredClass}`);
 }
