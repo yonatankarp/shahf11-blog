@@ -12,7 +12,10 @@ const { page } = Astro.props;
 const pageHref = (n) => withBase(n === 1 ? 'blog' : `blog/${n}`);
 const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
 ---
-<Base title="חיה בסרט(ן) — הבלוג">
+<Base
+  title={page.currentPage > 1 ? `הבלוג · עמוד ${page.currentPage} — חיה בסרט(ן)` : 'הבלוג — חיה בסרט(ן)'}
+  description={`כל ${page.total} הרשומות של הבלוג, מהישנה לחדשה.`}
+>
   <div class="tag-page">
     <h1 class="tag-page__title">הבלוג</h1>
     <p class="eyebrow">כל הרשומות, מהישנה לחדשה · עמוד {page.currentPage}</p>

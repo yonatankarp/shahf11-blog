@@ -3,7 +3,7 @@ import { render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import TagChips from '../../components/TagChips.astro';
 import { getTag } from '../../lib/tags';
-import { getAllPosts, getAdjacent } from '../../lib/posts';
+import { getAllPosts, getAdjacent, excerpt } from '../../lib/posts';
 import { withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
@@ -18,8 +18,19 @@ const truncated = post.data.review.includes('scan-truncated');
 const inlineImgs = (post.body ?? '').match(/images\/[^\s)]+/g) ?? [];
 const extraImgs = post.data.images.filter((f) => !inlineImgs.some((s) => s.endsWith(f)));
 const topic = (post.data.tags ?? []).map(getTag).find((t) => t.kind === 'topic');
+const description = excerpt(post.body ?? '');
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  datePublished: post.data.date.toISOString().slice(0, 10),
+  inLanguage: 'he',
+  author: { '@type': 'Person', name: 'חיה קרפ-צור' },
+  url: new URL(`${Astro.url.pathname.replace(/\/$/, '')}/`, Astro.site).href,
+});
 ---
-<Base title={post.data.title}>
+<Base title={`${post.data.title} — חיה בסרט(ן)`} description={description} ogType="article">
+  <script type="application/ld+json" set:html={jsonLd} is:inline slot="head" />
   <article class="post">
     <div class="post__meta">
       {topic && <a class="cat" href={withBase(`tags/${topic.id}`)}>{topic.label}</a>}

@@ -21,11 +21,20 @@ const highlights = HIGHLIGHTS.map((id) => byId.get(id)).filter(Boolean);
 const PUB = path.join(process.cwd(), 'public');
 const photoFile = ['haya.jpg', 'haya.jpeg', 'haya.png', 'haya.webp'].find((f) => fs.existsSync(path.join(PUB, f)));
 const heroPhoto = photoFile ? withBase(photoFile) : null;
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'חיה בסרט(ן)',
+  url: new URL(withBase(''), Astro.site).href,
+  inLanguage: 'he',
+  author: { '@type': 'Person', name: 'חיה קרפ-צור' },
+});
 ---
 <Base
   title="חיה בסרט(ן) — בלוג הזיכרון של חיה"
   description="ארכיון הבלוג 'חיה בסרט(ן)' מאת חיה, 2008–2009. מסע התמודדות עם סרטן השד, בהומור ובאומץ."
 >
+  <script type="application/ld+json" set:html={jsonLd} is:inline slot="head" />
   <section class="home-hero">
     <p class="home-hero__eyebrow">בלוג הזיכרון של חיה</p>
     {heroPhoto && <img class="home-hero__photo" src={heroPhoto} alt="חיה" width="180" height="180" />}
