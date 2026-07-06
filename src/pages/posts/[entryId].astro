@@ -14,6 +14,8 @@ const { post } = Astro.props;
 const { Content } = await render(post);
 const { newer, older } = await getAdjacent(post.data.entryId);
 const pdf = withBase(`posts-pdf/${post.id}.pdf`);
+const olderUrl = older ? withBase(`posts/${older.data.entryId}`) : null;
+const newerUrl = newer ? withBase(`posts/${newer.data.entryId}`) : null;
 const truncated = post.data.review.includes('scan-truncated');
 const inlineImgs = (post.body ?? '').match(/images\/[^\s)]+/g) ?? [];
 const extraImgs = post.data.images.filter((f) => !inlineImgs.some((s) => s === `images/${f}` || s.endsWith(`/${f}`)));
@@ -30,7 +32,11 @@ const jsonLd = JSON.stringify({
 }).replace(/</g, '\\u003c');
 ---
 <Base title={`${post.data.title} — חיה בסרט(ן)`} description={description} ogType="article">
-  <script type="application/ld+json" set:html={jsonLd} is:inline slot="head" />
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={jsonLd} is:inline />
+    {olderUrl && <link rel="prev" href={olderUrl} />}
+    {newerUrl && <link rel="next" href={newerUrl} />}
+  </Fragment>
   <article class="post">
     <div class="post__meta">
       {topic && <a class="cat" href={withBase(`tags/${topic.id}`)}>{topic.label}</a>}
@@ -64,8 +70,8 @@ const jsonLd = JSON.stringify({
       </div>
     </section>
     <nav class="post-nav" aria-label="ניווט בין רשומות">
-      {older ? <a href={withBase(`posts/${older.data.entryId}`)}>← {older.data.title}</a> : <span />}
-      {newer ? <a href={withBase(`posts/${newer.data.entryId}`)}>{newer.data.title} →</a> : <span />}
+      {older && olderUrl ? <a href={olderUrl} rel="prev" aria-label={`הרשומה הקודמת: ${older.data.title}`}>← {older.data.title}</a> : <span />}
+      {newer && newerUrl ? <a href={newerUrl} rel="next" aria-label={`הרשומה הבאה: ${newer.data.title}`}>{newer.data.title} →</a> : <span />}
     </nav>
   </article>
 </Base>
