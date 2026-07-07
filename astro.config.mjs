@@ -5,8 +5,8 @@ import { rewriteImageBase } from './src/lib/rehype-image-base.mjs';
 import { dropTitleH1 } from './src/lib/rehype-drop-title.mjs';
 
 export default defineConfig({
-  site: 'https://yonatankarp.com',
-  base: '/shahf11-blog',
+  site: 'https://hayabesartan.com',
+  base: '/',
   trailingSlash: 'ignore',
   integrations: [sitemap()],
   // Astro 7 defaults to the Sätteri processor; opt into the unified processor

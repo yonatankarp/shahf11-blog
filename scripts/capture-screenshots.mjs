@@ -16,7 +16,8 @@ const distDir = path.join(rootDir, 'dist');
 const screenshotDir = path.join(rootDir, 'screenshots');
 const dateStamp = new Date().toISOString().slice(0, 10);
 const PORT = 4321;
-const BASE = '/shahf11-blog';
+// Empty at the apex root; must match astro.config `base` so preview URLs line up.
+const BASE = '';
 const origin = `http://127.0.0.1:${PORT}`;
 
 if (!existsSync(distDir)) {

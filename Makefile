@@ -6,7 +6,7 @@
 help:
 	@echo "Targets:"
 	@echo "  make install   Install dependencies"
-	@echo "  make dev       Run the dev server at http://localhost:4321/shahf11-blog/"
+	@echo "  make dev       Run the dev server at http://localhost:4321/"
 	@echo "  make build     Build the static site into dist/"
 	@echo "  make preview   Serve the built site locally"
 	@echo "  make clean     Remove build output and installed deps"

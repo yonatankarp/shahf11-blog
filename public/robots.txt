@@ -1,8 +1,6 @@
-# Best-effort only: crawlers read robots.txt at the domain root
-# (https://yonatankarp.com/robots.txt, owned by the root-site repo), not at this
-# base-prefixed path. Sitemap discovery relies on <link rel="sitemap"> in the
-# page head and on registration in Search Console / the root robots.txt.
+# Served at the domain root (https://hayabesartan.com/robots.txt) now that this
+# site lives on its own apex domain rather than under a base-prefixed path.
 User-agent: *
 Allow: /
 
-Sitemap: https://yonatankarp.com/shahf11-blog/sitemap-index.xml
+Sitemap: https://hayabesartan.com/sitemap-index.xml

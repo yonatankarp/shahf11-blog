@@ -18,7 +18,8 @@ import { load as loadYaml } from 'js-yaml';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = path.join(rootDir, 'dist');
-const BASE = '/shahf11-blog';
+// Empty at the apex root; local asset URLs are absolute-rooted (/images/…, /gallery/…).
+const BASE = '';
 
 if (!existsSync(distDir)) {
   console.error('dist/ not found — run `npm run build` first.');
