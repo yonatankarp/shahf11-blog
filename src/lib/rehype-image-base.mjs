@@ -5,7 +5,8 @@ import path from 'node:path';
 // Rewrites inline markdown images (../images/X or images/X) to <base>/images/X,
 // and decorates every local images/ <img> with lazy loading + intrinsic dimensions
 // (from public/images-dimensions.json, written by scripts/copy-images.mjs).
-const BASE = '/shahf11-blog';
+// Empty at the apex root; must match astro.config `base` (as a no-trailing-slash prefix).
+const BASE = '';
 
 let dims;
 function dimensionsFor(file) {

@@ -53,6 +53,6 @@ they were recovered from the scans and added.) One post, 1280359, had its left m
 the printout scan; its full text was recovered from a 2019 web-archive snapshot of the original
 Tapuz post. See `posts_to_rescan.md`.
 
-Note: `/shahf11-blog/robots.txt` is not read by crawlers — `robots.txt` lives at the domain root,
-owned by the root-site repo. The sitemap is advertised via `<link rel="sitemap">` and should also
-be registered in Search Console / the root site's `robots.txt`.
+Note: the site is served at its own apex domain (`hayabesartan.com`), so `/robots.txt` sits at the
+domain root and is read by crawlers. It advertises the sitemap; the sitemap is also exposed via
+`<link rel="sitemap">` and can be registered in Search Console.
