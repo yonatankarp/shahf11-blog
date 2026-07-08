@@ -10,7 +10,8 @@
 //   5. every <a> pointing at posts-pdf/ or book/ is base-prefixed and the PDF
 //      file actually exists in dist/
 //   6. every internal archive link resolves to a built page/file, and same-page
-//      hash links point at an existing id/name
+//      hash-only links point at an existing id/name. Cross-page fragments are
+//      counted as internal links but currently checked only for file existence.
 //   7. post pages were generated
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -117,7 +118,13 @@ for (const file of files) {
     if (!href || /^(?:mailto:|tel:|javascript:)/i.test(href)) continue;
 
     if (href.startsWith('#')) {
-      const id = decodeURIComponent(href.slice(1));
+      let id;
+      try {
+        id = decodeURIComponent(href.slice(1));
+      } catch {
+        failures.push(`${rel}: malformed hash target: ${href}`);
+        continue;
+      }
       if (id && !targets.has(id)) failures.push(`${rel}: same-page hash target missing: ${href}`);
       continue;
     }
