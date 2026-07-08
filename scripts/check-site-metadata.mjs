@@ -50,6 +50,10 @@ function anchorTargets(html) {
   return targets;
 }
 
+function stripNonMarkupBodies(html) {
+  return html.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '');
+}
+
 function distPathForLocalUrl(rawHref) {
   let urlPath;
   try {
@@ -69,8 +73,9 @@ function distPathForLocalUrl(rawHref) {
 
 for (const file of files) {
   const html = await readFile(file, 'utf8');
+  const markup = stripNonMarkupBodies(html);
   const rel = path.relative(distDir, file);
-  const targets = anchorTargets(html);
+  const targets = anchorTargets(markup);
 
   const htmlTag = html.match(/<html\b[^>]*>/i)?.[0] ?? '';
   if (!/\blang=["']he["']/i.test(htmlTag) || !/\bdir=["']rtl["']/i.test(htmlTag)) {
@@ -80,7 +85,7 @@ for (const file of files) {
   const title = html.match(/<title>([\s\S]*?)<\/title>/i);
   if (!title || !title[1].trim()) failures.push(`${rel}: empty or missing <title>`);
 
-  for (const m of html.matchAll(/<img\b[^>]*\s(?:data-)?src=["']([^"']+)["']/gi)) {
+  for (const m of markup.matchAll(/<img\b[^>]*\s(?:data-)?src=["']([^"']+)["']/gi)) {
     const src = m[1];
     if (!/(?:^|\/|\.\.\/)(?:images|gallery\/(?:photos|thumbs))\//.test(src)) continue;
     imgCount += 1;
@@ -94,7 +99,7 @@ for (const file of files) {
     }
   }
 
-  for (const m of html.matchAll(/<a\b[^>]*\bhref=["']([^"']+\.pdf)["']/gi)) {
+  for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+\.pdf)["']/gi)) {
     const href = m[1];
     if (!href.includes('/posts-pdf/') && !href.includes('/book/')) continue;
     pdfCount += 1;
@@ -107,7 +112,7 @@ for (const file of files) {
     }
   }
 
-  for (const m of html.matchAll(/<a\b[^>]*\bhref=["']([^"']+)["']/gi)) {
+  for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+)["']/gi)) {
     const href = m[1];
     if (!href || /^(?:mailto:|tel:|javascript:)/i.test(href)) continue;
 
