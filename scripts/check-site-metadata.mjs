@@ -9,7 +9,10 @@
 //   4. each referenced image file actually exists in dist/
 //   5. every <a> pointing at posts-pdf/ or book/ is base-prefixed and the PDF
 //      file actually exists in dist/
-//   6. post pages were generated
+//   6. every internal archive link resolves to a built page/file, and same-page
+//      hash-only links point at an existing id/name. Cross-page fragments are
+//      counted as internal links but currently checked only for file existence.
+//   7. post pages were generated
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -40,10 +43,40 @@ const failures = [];
 const files = await htmlFiles(distDir);
 let imgCount = 0;
 let pdfCount = 0;
+let internalLinkCount = 0;
+
+function anchorTargets(html) {
+  const targets = new Set();
+  for (const m of html.matchAll(/\s(?:id|name)=["']([^"']+)["']/gi)) targets.add(m[1]);
+  return targets;
+}
+
+function stripNonMarkupBodies(html) {
+  return html.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '');
+}
+
+function distPathForLocalUrl(rawHref) {
+  let urlPath;
+  try {
+    const url = new URL(rawHref, 'https://yonatankarp.com');
+    if (url.origin !== 'https://yonatankarp.com') return null;
+    urlPath = url.pathname;
+  } catch {
+    return null;
+  }
+
+  if (!urlPath.startsWith(`${BASE}/`) && urlPath !== BASE) return null;
+  const localPath = urlPath.slice(BASE.length).replace(/^\/+/, '');
+  if (localPath === '') return path.join(distDir, 'index.html');
+  if (path.extname(localPath)) return path.join(distDir, localPath);
+  return path.join(distDir, localPath, 'index.html');
+}
 
 for (const file of files) {
   const html = await readFile(file, 'utf8');
+  const markup = stripNonMarkupBodies(html);
   const rel = path.relative(distDir, file);
+  const targets = anchorTargets(markup);
 
   const htmlTag = html.match(/<html\b[^>]*>/i)?.[0] ?? '';
   if (!/\blang=["']he["']/i.test(htmlTag) || !/\bdir=["']rtl["']/i.test(htmlTag)) {
@@ -53,7 +86,7 @@ for (const file of files) {
   const title = html.match(/<title>([\s\S]*?)<\/title>/i);
   if (!title || !title[1].trim()) failures.push(`${rel}: empty or missing <title>`);
 
-  for (const m of html.matchAll(/<img\b[^>]*\s(?:data-)?src=["']([^"']+)["']/gi)) {
+  for (const m of markup.matchAll(/<img\b[^>]*\s(?:data-)?src=["']([^"']+)["']/gi)) {
     const src = m[1];
     if (!/(?:^|\/|\.\.\/)(?:images|gallery\/(?:photos|thumbs))\//.test(src)) continue;
     imgCount += 1;
@@ -67,7 +100,7 @@ for (const file of files) {
     }
   }
 
-  for (const m of html.matchAll(/<a\b[^>]*\bhref=["']([^"']+\.pdf)["']/gi)) {
+  for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+\.pdf)["']/gi)) {
     const href = m[1];
     if (!href.includes('/posts-pdf/') && !href.includes('/book/')) continue;
     pdfCount += 1;
@@ -78,6 +111,28 @@ for (const file of files) {
     if (!existsSync(path.join(distDir, href.slice(BASE.length + 1)))) {
       failures.push(`${rel}: pdf file missing in dist: ${href}`);
     }
+  }
+
+  for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+)["']/gi)) {
+    const href = m[1];
+    if (!href || /^(?:mailto:|tel:|javascript:)/i.test(href)) continue;
+
+    if (href.startsWith('#')) {
+      let id;
+      try {
+        id = decodeURIComponent(href.slice(1));
+      } catch {
+        failures.push(`${rel}: malformed hash target: ${href}`);
+        continue;
+      }
+      if (id && !targets.has(id)) failures.push(`${rel}: same-page hash target missing: ${href}`);
+      continue;
+    }
+
+    const targetPath = distPathForLocalUrl(href);
+    if (!targetPath) continue;
+    internalLinkCount += 1;
+    if (!existsSync(targetPath)) failures.push(`${rel}: internal link target missing: ${href}`);
   }
 }
 
@@ -105,5 +160,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs and ${pdfCount} pdf links base-prefixed and present.`,
+  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, and ${internalLinkCount} internal links verified.`,
 );
