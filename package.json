@@ -16,13 +16,13 @@
     "check": "npm run check:blog-assets && npm run check:gallery-assets && npm run build && npm run check:site-metadata"
   },
   "dependencies": {
-    "@astrojs/markdown-remark": "^7.2.0",
+    "@astrojs/markdown-remark": "^7.2.1",
     "@astrojs/sitemap": "^3.7.3",
     "@fontsource-variable/assistant": "^5.0.0",
     "@fontsource-variable/frank-ruhl-libre": "^5.0.0",
     "@fontsource/gveret-levin": "^5.2.1",
     "@fontsource/heebo": "^5.2.8",
-    "astro": "^7.0.5",
+    "astro": "^7.0.7",
     "js-yaml": "^5.2.1",
     "sharp": "^0.35.3",
     "unist-util-visit": "^5.0.0"
