@@ -60,29 +60,6 @@ const jsonLd = JSON.stringify({
         <TagChips tags={post.data.tags} />
       </section>
     )}
-    <section class="post-source" aria-label="פרטי מקור">
-      <h2 class="eyebrow">פרטי מקור</h2>
-      <dl>
-        <div>
-          <dt>מספר רשומה</dt>
-          <dd dir="ltr">{post.data.entryId}</dd>
-        </div>
-        {post.data.source_scan && (
-          <div>
-            <dt>סריקה</dt>
-            <dd dir="ltr">{post.data.source_scan}</dd>
-          </div>
-        )}
-        <div>
-          <dt>עמודים</dt>
-          <dd>{post.data.pages}</dd>
-        </div>
-        <div>
-          <dt>מקור</dt>
-          <dd><a href={post.data.source_url}>קישור ההדפסה המקורי בטפוז</a></dd>
-        </div>
-      </dl>
-    </section>
     <section class="post-download" aria-label="הורדה">
       <div class="book-download-card">
         <div class="book-download-card__body">
