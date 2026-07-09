@@ -206,6 +206,16 @@ a.cat:hover { filter: brightness(1.1); }
 .post-download .book-downloads__links { margin-block-start: 0; }
 .post__tags { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; margin-block-start: 1.8rem; padding-block-start: 1.4rem; border-block-start: 1px solid var(--line); }
 .post__tags .eyebrow { font-size: .76rem; }
+.post-source {
+  margin-block-start: 1.6rem; padding-block-start: 1.2rem; border-block-start: 1px solid var(--line);
+  font-family: var(--sans); color: var(--mut);
+}
+.post-source dl {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: .7rem 1rem; margin: .7rem 0 0;
+}
+.post-source dt { font-size: .72rem; font-weight: 700; color: #6b513e; }
+.post-source dd { margin: .1rem 0 0; font-size: .86rem; line-height: 1.45; }
 .post-nav {
   display: flex; justify-content: space-between; gap: 1.2rem;
   font-family: var(--sans); font-weight: 600; font-size: .88rem;
