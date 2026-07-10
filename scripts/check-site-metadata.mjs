@@ -13,6 +13,8 @@
 //      hash-only links point at an existing id/name. Cross-page fragments are
 //      counted as internal links but currently checked only for file existence.
 //   7. post pages were generated
+//   8. social preview metadata covers Open Graph, Twitter cards, and legacy
+//      itemprop tags used by common social crawlers.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -55,6 +57,31 @@ function stripNonMarkupBodies(html) {
   return html.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, '');
 }
 
+function attrValue(tag, attr) {
+  const escaped = attr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = tag.match(new RegExp(`\\s${escaped}=["']([^"']+)["']`, 'i'));
+  return match?.[1]?.trim() ?? '';
+}
+
+function metaTags(markup) {
+  const tags = new Map();
+  for (const m of markup.matchAll(/<meta\b[^>]*>/gi)) {
+    const tag = m[0];
+    const key = attrValue(tag, 'property') || attrValue(tag, 'name') || attrValue(tag, 'itemprop');
+    const content = attrValue(tag, 'content');
+    if (!key || !content) continue;
+    if (!tags.has(key)) tags.set(key, []);
+    tags.get(key).push(content);
+  }
+  return tags;
+}
+
+function requireMeta(tags, rel, keys) {
+  for (const key of keys) {
+    if (!tags.has(key)) failures.push(`${rel}: missing social metadata: ${key}`);
+  }
+}
+
 function distPathForLocalUrl(rawHref) {
   let urlPath;
   try {
@@ -77,6 +104,7 @@ for (const file of files) {
   const markup = stripNonMarkupBodies(html);
   const rel = path.relative(distDir, file);
   const targets = anchorTargets(markup);
+  const metas = metaTags(markup);
 
   const htmlTag = html.match(/<html\b[^>]*>/i)?.[0] ?? '';
   if (!/\blang=["']he["']/i.test(htmlTag) || !/\bdir=["']rtl["']/i.test(htmlTag)) {
@@ -85,6 +113,37 @@ for (const file of files) {
 
   const title = html.match(/<title>([\s\S]*?)<\/title>/i);
   if (!title || !title[1].trim()) failures.push(`${rel}: empty or missing <title>`);
+  const hasDescription = metas.has('description');
+
+  requireMeta(metas, rel, [
+    'og:title',
+    'og:type',
+    'og:site_name',
+    'og:locale',
+    'og:url',
+    'og:image',
+    'og:image:secure_url',
+    'og:image:type',
+    'og:image:width',
+    'og:image:height',
+    'og:image:alt',
+    'twitter:card',
+    'twitter:title',
+    'twitter:image',
+    'twitter:image:alt',
+    'name',
+    'image',
+  ]);
+  if (hasDescription) requireMeta(metas, rel, ['og:description', 'twitter:description', 'description']);
+  if (metas.get('twitter:card')?.[0] !== 'summary_large_image') {
+    failures.push(`${rel}: twitter:card should be summary_large_image`);
+  }
+  if (metas.get('og:image')?.[0] !== metas.get('twitter:image')?.[0]) {
+    failures.push(`${rel}: og:image and twitter:image differ`);
+  }
+  if (metas.get('og:type')?.[0] === 'article') {
+    requireMeta(metas, rel, ['article:published_time', 'article:author', 'article:tag']);
+  }
 
   for (const m of markup.matchAll(/<img\b[^>]*\s(?:data-)?src=["']([^"']+)["']/gi)) {
     const src = m[1];

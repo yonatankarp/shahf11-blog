@@ -21,6 +21,7 @@ const inlineImgs = (post.body ?? '').match(/images\/[^\s)]+/g) ?? [];
 const extraImgs = post.data.images.filter((f) => !inlineImgs.some((s) => s === `images/${f}` || s.endsWith(`/${f}`)));
 const topic = (post.data.tags ?? []).map(getTag).find((t) => t.kind === 'topic');
 const description = excerpt(post.body ?? '');
+const socialTags = (post.data.tags ?? []).map((tag) => getTag(tag).label);
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -31,7 +32,13 @@ const jsonLd = JSON.stringify({
   url: new URL(`${Astro.url.pathname.replace(/\/$/, '')}/`, Astro.site).href,
 }).replace(/</g, '\\u003c');
 ---
-<Base title={`${post.data.title} — חיה בסרט(ן)`} description={description} ogType="article">
+<Base
+  title={`${post.data.title} — חיה בסרט(ן)`}
+  description={description}
+  ogType="article"
+  articlePublishedTime={post.data.date.toISOString()}
+  articleTags={socialTags}
+>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={jsonLd} is:inline />
     {olderUrl && <link rel="prev" href={olderUrl} />}
