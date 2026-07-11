@@ -10,8 +10,7 @@
 //   5. every <a> pointing at posts-pdf/ or book/ is base-prefixed and the PDF
 //      file actually exists in dist/
 //   6. every internal archive link resolves to a built page/file, and same-page
-//      hash-only links point at an existing id/name. Cross-page fragments are
-//      counted as internal links but currently checked only for file existence.
+//      plus cross-page fragments point at an existing id/name.
 //   7. post pages were generated
 //   8. social preview metadata covers Open Graph, Twitter cards, and legacy
 //      itemprop tags used by common social crawlers.
@@ -46,6 +45,7 @@ const files = await htmlFiles(distDir);
 let imgCount = 0;
 let pdfCount = 0;
 let internalLinkCount = 0;
+const pageTargets = new Map();
 
 function anchorTargets(html) {
   const targets = new Set();
@@ -82,21 +82,39 @@ function requireMeta(tags, rel, keys) {
   }
 }
 
-function distPathForLocalUrl(rawHref) {
-  let urlPath;
+function localTargetForUrl(rawHref) {
+  let url;
   try {
-    const url = new URL(rawHref, 'https://yonatankarp.com');
+    url = new URL(rawHref, 'https://yonatankarp.com');
     if (url.origin !== 'https://yonatankarp.com') return null;
-    urlPath = url.pathname;
   } catch {
     return null;
   }
 
+  const urlPath = url.pathname;
   if (!urlPath.startsWith(`${BASE}/`) && urlPath !== BASE) return null;
   const localPath = urlPath.slice(BASE.length).replace(/^\/+/, '');
-  if (localPath === '') return path.join(distDir, 'index.html');
-  if (path.extname(localPath)) return path.join(distDir, localPath);
-  return path.join(distDir, localPath, 'index.html');
+  const targetPath =
+    localPath === ''
+      ? path.join(distDir, 'index.html')
+      : path.extname(localPath)
+        ? path.join(distDir, localPath)
+        : path.join(distDir, localPath, 'index.html');
+  return { targetPath, hash: url.hash };
+}
+
+function decodeHash(hash, rel, href) {
+  try {
+    return decodeURIComponent(hash.replace(/^#/, ''));
+  } catch {
+    failures.push(`${rel}: malformed hash target: ${href}`);
+    return null;
+  }
+}
+
+for (const file of files) {
+  const html = await readFile(file, 'utf8');
+  pageTargets.set(file, anchorTargets(stripNonMarkupBodies(html)));
 }
 
 for (const file of files) {
@@ -177,21 +195,22 @@ for (const file of files) {
     if (!href || /^(?:mailto:|tel:|javascript:)/i.test(href)) continue;
 
     if (href.startsWith('#')) {
-      let id;
-      try {
-        id = decodeURIComponent(href.slice(1));
-      } catch {
-        failures.push(`${rel}: malformed hash target: ${href}`);
-        continue;
-      }
+      const id = decodeHash(href, rel, href);
       if (id && !targets.has(id)) failures.push(`${rel}: same-page hash target missing: ${href}`);
       continue;
     }
 
-    const targetPath = distPathForLocalUrl(href);
-    if (!targetPath) continue;
+    const target = localTargetForUrl(href);
+    if (!target) continue;
     internalLinkCount += 1;
+    const { targetPath, hash } = target;
     if (!existsSync(targetPath)) failures.push(`${rel}: internal link target missing: ${href}`);
+    if (hash && existsSync(targetPath) && path.extname(targetPath) === '.html') {
+      const id = decodeHash(hash, rel, href);
+      if (id && !pageTargets.get(targetPath)?.has(id)) {
+        failures.push(`${rel}: cross-page hash target missing: ${href}`);
+      }
+    }
   }
 }
 
