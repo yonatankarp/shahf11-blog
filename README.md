@@ -5,7 +5,9 @@ Archive of the Hebrew blog **חיה בסרט(ן)** by *shahf11*, originally publ
 into the parentheses. The blog documents the author's breast-cancer journey with humor.
 
 The original posts were printed and scanned. This repository reconstructs them as text so the
-blog can be rebuilt as a website, while keeping the scanned PDFs as downloadable originals.
+blog can be rebuilt as a website, while keeping the scanned PDFs as downloadable originals. Tapuz
+no longer exists as a live source; keep Tapuz references as archival metadata only, not public
+outbound links.
 
 ## Layout
 
@@ -31,7 +33,7 @@ date_published: publish date from the post's "פורסם ב…" line (Hebrew)
 date:           ISO date derived from date_published, used for ordering
 category:       post category
 date_stamp:     the print-stamp date (differs from publish date)
-source_url:     original tapuz print URL
+source_url:     original tapuz print URL, retained as archival metadata only
 source_scan:    which scan file and pages this came from
 pages:          number of content pages
 lang: he

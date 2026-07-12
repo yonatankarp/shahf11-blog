@@ -73,6 +73,28 @@ const jsonLd = JSON.stringify({
           <p class="book-downloads__links">
             <a href={pdf}>הורדת הסריקה המקורית (PDF)</a>
           </p>
+          <dl class="post-source">
+            {post.data.source_scan && (
+              <div>
+                <dt>סריקה</dt>
+                <dd dir="ltr">{post.data.source_scan}</dd>
+              </div>
+            )}
+            {post.data.date_stamp && (
+              <div>
+                <dt>חותמת הדפסה</dt>
+                <dd>{post.data.date_stamp}</dd>
+              </div>
+            )}
+            <div>
+              <dt>עמודים</dt>
+              <dd>{post.data.pages}</dd>
+            </div>
+            <div>
+              <dt>זיהוי תפוז היסטורי</dt>
+              <dd dir="ltr">EntryId {post.data.entryId}</dd>
+            </div>
+          </dl>
         </div>
       </div>
     </section>
