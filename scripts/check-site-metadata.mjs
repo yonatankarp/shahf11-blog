@@ -22,6 +22,7 @@ import { load as loadYaml } from 'js-yaml';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = path.join(rootDir, 'dist');
+const SITE_ORIGIN = 'https://hayabesartan.com';
 // Empty at the apex root; local asset URLs are absolute-rooted (/images/…, /gallery/…).
 const BASE = '';
 
@@ -85,8 +86,8 @@ function requireMeta(tags, rel, keys) {
 function localTargetForUrl(rawHref) {
   let url;
   try {
-    url = new URL(rawHref, 'https://yonatankarp.com');
-    if (url.origin !== 'https://yonatankarp.com') return null;
+    url = new URL(rawHref, SITE_ORIGIN);
+    if (url.origin !== SITE_ORIGIN) return null;
   } catch {
     return null;
   }
