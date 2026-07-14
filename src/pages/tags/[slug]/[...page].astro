@@ -30,7 +30,7 @@ const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
     <nav class="pagination" aria-label="ניווט בין עמודי התגית">
       {page.url.prev
         ? <a class="pagination__step" href={page.url.prev}>ישנים יותר →</a>
-        : <span class="pagination__step is-disabled">ישנים יותר →</span>}
+        : <span class="pagination__step is-disabled" aria-disabled="true">ישנים יותר →</span>}
       <ol class="pagination__pages">
         {pages.map((n) => (
           <li>
@@ -42,7 +42,7 @@ const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
       </ol>
       {page.url.next
         ? <a class="pagination__step" href={page.url.next}>← חדשים יותר</a>
-        : <span class="pagination__step is-disabled">← חדשים יותר</span>}
+        : <span class="pagination__step is-disabled" aria-disabled="true">← חדשים יותר</span>}
     </nav>
   )}
 </Base>
