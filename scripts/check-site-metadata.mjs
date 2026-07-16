@@ -14,6 +14,7 @@
 //   7. post pages were generated
 //   8. social preview metadata covers Open Graph, Twitter cards, and legacy
 //      itemprop tags used by common social crawlers.
+//   9. links that open a new tab include rel="noopener".
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -192,8 +193,14 @@ for (const file of files) {
   }
 
   for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+)["']/gi)) {
+    const tag = m[0];
     const href = m[1];
     if (!href || /^(?:mailto:|tel:|javascript:)/i.test(href)) continue;
+
+    if (attrValue(tag, 'target').toLowerCase() === '_blank') {
+      const relValues = attrValue(tag, 'rel').toLowerCase().split(/\s+/).filter(Boolean);
+      if (!relValues.includes('noopener')) failures.push(`${rel}: target="_blank" link missing rel="noopener": ${href}`);
+    }
 
     if (href.startsWith('#')) {
       const id = decodeHash(href, rel, href);
