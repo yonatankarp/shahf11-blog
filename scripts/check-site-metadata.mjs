@@ -15,6 +15,8 @@
 //   8. social preview metadata covers Open Graph, Twitter cards, and legacy
 //      itemprop tags used by common social crawlers.
 //   9. links that open a new tab include rel="noopener".
+//  10. rendered links do not point visitors at dead Tapuz URLs; Tapuz references
+//      belong in archival metadata only.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -47,6 +49,7 @@ const files = await htmlFiles(distDir);
 let imgCount = 0;
 let pdfCount = 0;
 let internalLinkCount = 0;
+let tapuzLinkCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -111,6 +114,15 @@ function decodeHash(hash, rel, href) {
   } catch {
     failures.push(`${rel}: malformed hash target: ${href}`);
     return null;
+  }
+}
+
+function isTapuzUrl(rawHref) {
+  try {
+    const url = new URL(rawHref, SITE_ORIGIN);
+    return url.hostname === 'tapuz.co.il' || url.hostname.endsWith('.tapuz.co.il');
+  } catch {
+    return false;
   }
 }
 
@@ -197,6 +209,11 @@ for (const file of files) {
     const href = m[1];
     if (!href || /^(?:mailto:|tel:|javascript:)/i.test(href)) continue;
 
+    if (isTapuzUrl(href)) {
+      tapuzLinkCount += 1;
+      failures.push(`${rel}: public link points at dead Tapuz URL: ${href}`);
+    }
+
     if (attrValue(tag, 'target').toLowerCase() === '_blank') {
       const relValues = attrValue(tag, 'rel').toLowerCase().split(/\s+/).filter(Boolean);
       if (!relValues.includes('noopener')) failures.push(`${rel}: target="_blank" link missing rel="noopener": ${href}`);
@@ -246,5 +263,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, and ${internalLinkCount} internal links verified.`,
+  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
