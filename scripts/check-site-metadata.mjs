@@ -18,6 +18,8 @@
 //  10. links that open a new tab include rel="noopener".
 //  11. rendered links do not point visitors at dead Tapuz URLs; Tapuz references
 //      belong in archival metadata only.
+//  11. every page has a canonical URL for its own built route, and social
+//      metadata points at that same canonical URL.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -82,6 +84,12 @@ function metaTags(markup) {
   return tags;
 }
 
+function linkTags(markup, relName) {
+  return [...markup.matchAll(/<link\b[^>]*>/gi)]
+    .map((m) => m[0])
+    .filter((tag) => attrValue(tag, 'rel').toLowerCase().split(/\s+/).includes(relName));
+}
+
 function requireMeta(tags, rel, keys) {
   for (const key of keys) {
     if (!tags.has(key)) failures.push(`${rel}: missing social metadata: ${key}`);
@@ -138,6 +146,8 @@ for (const file of files) {
   const rel = path.relative(distDir, file);
   const targets = anchorTargets(markup);
   const metas = metaTags(markup);
+  const canonicalLinks = linkTags(markup, 'canonical');
+  const sitemapLinks = linkTags(markup, 'sitemap');
 
   const htmlTag = html.match(/<html\b[^>]*>/i)?.[0] ?? '';
   if (!/\blang=["']he["']/i.test(htmlTag) || !/\bdir=["']rtl["']/i.test(htmlTag)) {
@@ -147,6 +157,39 @@ for (const file of files) {
   const title = html.match(/<title>([\s\S]*?)<\/title>/i);
   if (!title || !title[1].trim()) failures.push(`${rel}: empty or missing <title>`);
   const hasDescription = metas.has('description');
+
+  if (canonicalLinks.length !== 1) {
+    failures.push(`${rel}: expected exactly one canonical link, found ${canonicalLinks.length}`);
+  } else {
+    const href = attrValue(canonicalLinks[0], 'href');
+    let canonicalUrl = null;
+    try {
+      canonicalUrl = new URL(href);
+    } catch {
+      failures.push(`${rel}: canonical URL is not absolute: ${href}`);
+    }
+    if (canonicalUrl) {
+      if (canonicalUrl.origin !== SITE_ORIGIN) failures.push(`${rel}: canonical URL has unexpected origin: ${href}`);
+      if (canonicalUrl.search || canonicalUrl.hash) failures.push(`${rel}: canonical URL should not include search or hash: ${href}`);
+      const target = localTargetForUrl(canonicalUrl.href);
+      if (!target || path.resolve(target.targetPath) !== path.resolve(file)) {
+        failures.push(`${rel}: canonical URL does not resolve to this page: ${href}`);
+      }
+      if (metas.get('og:url')?.[0] !== canonicalUrl.href) {
+        failures.push(`${rel}: og:url does not match canonical URL`);
+      }
+    }
+  }
+
+  if (sitemapLinks.length < 1) {
+    failures.push(`${rel}: missing sitemap link`);
+  } else {
+    for (const tag of sitemapLinks) {
+      const href = attrValue(tag, 'href');
+      const target = localTargetForUrl(href);
+      if (!target || !existsSync(target.targetPath)) failures.push(`${rel}: sitemap link target missing: ${href}`);
+    }
+  }
 
   requireMeta(metas, rel, [
     'og:title',
