@@ -7,15 +7,16 @@
 //      via both src and deferred data-src attributes — this is what
 //      rewriteImageBase + withBase produce; a miss ships broken images
 //   4. each referenced image file actually exists in dist/
-//   5. every <a> pointing at posts-pdf/ or book/ is base-prefixed and the PDF
+//   5. every local archive image has alternative text
+//   6. every <a> pointing at posts-pdf/ or book/ is base-prefixed and the PDF
 //      file actually exists in dist/
-//   6. every internal archive link resolves to a built page/file, and same-page
+//   7. every internal archive link resolves to a built page/file, and same-page
 //      plus cross-page fragments point at an existing id/name.
-//   7. post pages were generated
-//   8. social preview metadata covers Open Graph, Twitter cards, and legacy
+//   8. post pages were generated
+//   9. social preview metadata covers Open Graph, Twitter cards, and legacy
 //      itemprop tags used by common social crawlers.
-//   9. links that open a new tab include rel="noopener".
-//  10. rendered links do not point visitors at dead Tapuz URLs; Tapuz references
+//  10. links that open a new tab include rel="noopener".
+//  11. rendered links do not point visitors at dead Tapuz URLs; Tapuz references
 //      belong in archival metadata only.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -177,17 +178,22 @@ for (const file of files) {
     requireMeta(metas, rel, ['article:published_time', 'article:author', 'article:tag']);
   }
 
-  for (const m of markup.matchAll(/<img\b[^>]*\s(?:data-)?src=["']([^"']+)["']/gi)) {
-    const src = m[1];
-    if (!/(?:^|\/|\.\.\/)(?:images|gallery\/(?:photos|thumbs))\//.test(src)) continue;
-    imgCount += 1;
-    if (!src.startsWith(`${BASE}/`)) {
-      failures.push(`${rel}: image src not base-prefixed: ${src}`);
-      continue;
-    }
-    // BASE is a URL prefix, not a dist subdirectory — files live at dist/images/.
-    if (!existsSync(path.join(distDir, src.slice(BASE.length + 1)))) {
-      failures.push(`${rel}: image file missing in dist: ${src}`);
+  for (const m of markup.matchAll(/<img\b[^>]*>/gi)) {
+    const tag = m[0];
+    const srcs = [attrValue(tag, 'src'), attrValue(tag, 'data-src')].filter(Boolean);
+    const localSrcs = srcs.filter((src) => /(?:^|\/|\.\.\/)(?:images|gallery\/(?:photos|thumbs))\//.test(src));
+    if (localSrcs.length === 0) continue;
+    if (!attrValue(tag, 'alt')) failures.push(`${rel}: local image missing alt text: ${localSrcs[0]}`);
+    for (const src of localSrcs) {
+      imgCount += 1;
+      if (!src.startsWith(`${BASE}/`)) {
+        failures.push(`${rel}: image src not base-prefixed: ${src}`);
+        continue;
+      }
+      // BASE is a URL prefix, not a dist subdirectory — files live at dist/images/.
+      if (!existsSync(path.join(distDir, src.slice(BASE.length + 1)))) {
+        failures.push(`${rel}: image file missing in dist: ${src}`);
+      }
     }
   }
 
