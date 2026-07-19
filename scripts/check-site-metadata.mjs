@@ -175,7 +175,7 @@ for (const file of files) {
       if (!target || path.resolve(target.targetPath) !== path.resolve(file)) {
         failures.push(`${rel}: canonical URL does not resolve to this page: ${href}`);
       }
-      if (metas.get('og:url')?.[0] !== canonicalUrl.href) {
+      if (metas.get('og:url')?.[0] !== href) {
         failures.push(`${rel}: og:url does not match canonical URL`);
       }
     }
