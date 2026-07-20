@@ -13,7 +13,6 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const { newer, older } = await getAdjacent(post.data.entryId);
-const pdf = withBase(`posts-pdf/${post.id}.pdf`);
 const olderUrl = older ? withBase(`posts/${older.data.entryId}`) : null;
 const newerUrl = newer ? withBase(`posts/${newer.data.entryId}`) : null;
 const truncated = post.data.review.includes('scan-truncated');
@@ -52,7 +51,7 @@ const jsonLd = JSON.stringify({
     <h1 class="post__title disp">{post.data.title}</h1>
     {truncated && (
       <p class="post__note">
-        הערה: הסריקה של רשומה זו חתוכה בשוליים וחלק מהטקסט חסר. התמלול הוא כמיטב היכולת; ראו את הסריקה המקורית.
+        הערה: הסריקה של רשומה זו חתוכה בשוליים וחלק מהטקסט חסר. התמלול הוא כמיטב היכולת.
       </p>
     )}
     {extraImgs.length > 0 && (
@@ -67,41 +66,6 @@ const jsonLd = JSON.stringify({
         <TagChips tags={post.data.tags} />
       </section>
     )}
-    <section class="post-download" aria-label="הורדה">
-      <div class="book-download-card">
-        <div class="book-download-card__body">
-          <p class="book-downloads__links">
-            <a href={pdf}>הורדת הסריקה המקורית (PDF)</a>
-          </p>
-          <dl class="post-source">
-            {post.data.source_scan && (
-              <div>
-                <dt>סריקה</dt>
-                <dd dir="ltr">{post.data.source_scan}</dd>
-              </div>
-            )}
-            {post.data.date_stamp && (
-              <div>
-                <dt>חותמת הדפסה</dt>
-                <dd>{post.data.date_stamp}</dd>
-              </div>
-            )}
-            <div>
-              <dt>עמודים</dt>
-              <dd>{post.data.pages}</dd>
-            </div>
-            <div>
-              <dt>זיהוי תפוז היסטורי</dt>
-              <dd dir="ltr">EntryId {post.data.entryId}</dd>
-            </div>
-            <div>
-              <dt>כתובת מקור ארכיונית</dt>
-              <dd dir="ltr">{post.data.source_url}</dd>
-            </div>
-          </dl>
-        </div>
-      </div>
-    </section>
     <nav class="post-nav" aria-label="ניווט בין רשומות">
       {older && olderUrl ? <a href={olderUrl} rel="prev" aria-label={`הרשומה הקודמת: ${older.data.title}`}>← {older.data.title}</a> : <span />}
       {newer && newerUrl ? <a href={newerUrl} rel="next" aria-label={`הרשומה הבאה: ${newer.data.title}`}>{newer.data.title} →</a> : <span />}
