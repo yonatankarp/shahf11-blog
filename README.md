@@ -5,15 +5,14 @@ Archive of the Hebrew blog **חיה בסרט(ן)** by *shahf11*, originally publ
 into the parentheses. The blog documents the author's breast-cancer journey with humor.
 
 The original posts were printed and scanned. This repository reconstructs them as text so the
-blog can be rebuilt as a website, while keeping the scanned PDFs as downloadable originals. Tapuz
-no longer exists as a live source; keep Tapuz references as archival metadata only, not public
-outbound links.
+blog can be rebuilt as a website. Tapuz/scan/source references belong in archival metadata only,
+not reader-facing post content or public links.
 
 ## Layout
 
 ```
 content/         Markdown page per post (YAML frontmatter + body). The future website pages.
-public/posts-pdf/  Per-post scanned PDF, one file per post. Downloadable original source.
+public/posts-pdf/  Per-post scanned PDF, one file per post. Archival provenance source.
 images/          Photos embedded in posts, deskewed. Referenced from each post's frontmatter.
 gallery/         Standalone gallery of photos of חיה (photos/ + photos.yaml manifest). See gallery/README.md.
 index.csv        Machine-readable index of all posts (order, EntryId, date, source location).
@@ -45,9 +44,9 @@ review:         quality flags for pages that need a manual look, if any
 ## Provenance and accuracy
 
 Text is OCR from the scans (tesseract, Hebrew). Body text is high fidelity; titles were read
-with a vision model for accuracy. Dates and text may still contain OCR errors, so treat the
-scanned PDF in `public/posts-pdf/` as the authoritative source when in doubt. Posts flagged in
-`review` need a manual pass.
+with a vision model for accuracy. Dates and text may still contain OCR errors. The scanned PDFs
+in `public/posts-pdf/` are retained as archival provenance. Posts flagged in `review` need a
+manual pass.
 
 All 182 posts are archived here. (An earlier count held back 9 posts as "missing a page";
 on review the absent page was in each case the trailing navigation page, not body text, so
