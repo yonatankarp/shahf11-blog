@@ -14,5 +14,5 @@ const topic = (post.data.tags ?? []).map(getTag).find((t) => t.kind === 'topic')
   </div>
   <h2 class="post-card__title"><a href={href}>{post.data.title}</a></h2>
   <p class="excerpt">{excerpt(post.body ?? '')}</p>
-  <a class="post-card__more" href={href}>המשך קריאה ←</a>
+  <a class="post-card__more" href={href} aria-label={`המשך קריאה: ${post.data.title}`}>המשך קריאה ←</a>
 </article>
