@@ -16,9 +16,10 @@
 //   9. social preview metadata covers Open Graph, Twitter cards, and legacy
 //      itemprop tags used by common social crawlers.
 //  10. links that open a new tab include rel="noopener".
-//  11. rendered links do not point visitors at dead Tapuz URLs; Tapuz references
+//  11. gallery images carry intrinsic dimensions, limiting layout shifts.
+//  12. rendered links do not point visitors at dead Tapuz URLs; Tapuz references
 //      belong in archival metadata only.
-//  11. every page has a canonical URL for its own built route, and social
+//  13. every page has a canonical URL for its own built route, and social
 //      metadata points at that same canonical URL.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -229,6 +230,9 @@ for (const file of files) {
     if (!attrValue(tag, 'alt')) failures.push(`${rel}: local image missing alt text: ${localSrcs[0]}`);
     for (const src of localSrcs) {
       imgCount += 1;
+      if (src.includes('/gallery/') && (!attrValue(tag, 'width') || !attrValue(tag, 'height'))) {
+        failures.push(`${rel}: gallery image missing intrinsic dimensions: ${src}`);
+      }
       if (!src.startsWith(`${BASE}/`)) {
         failures.push(`${rel}: image src not base-prefixed: ${src}`);
         continue;
