@@ -6,5 +6,6 @@ dist/
 public/images/
 public/gallery/
 public/images-dimensions.json
+public/gallery-dimensions.json
 screenshots/
 tags-draft.md

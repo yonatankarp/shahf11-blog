@@ -51,8 +51,10 @@ async function syncResized(srcDir, destDir, maxWidth, dims) {
 }
 
 const dims = {};
+const galleryDims = { photos: {}, thumbs: {} };
 const a = await syncResized('images', 'public/images', DISPLAY_MAX, dims);
-const b = await syncResized('gallery/photos', 'public/gallery/photos', DISPLAY_MAX, null);
-const c = await syncResized('gallery/photos', 'public/gallery/thumbs', THUMB_MAX, null);
+const b = await syncResized('gallery/photos', 'public/gallery/photos', DISPLAY_MAX, galleryDims.photos);
+const c = await syncResized('gallery/photos', 'public/gallery/thumbs', THUMB_MAX, galleryDims.thumbs);
 await writeFile('public/images-dimensions.json', JSON.stringify(dims));
+await writeFile('public/gallery-dimensions.json', JSON.stringify(galleryDims));
 console.log(`images -> public/images (${a} converted), gallery -> photos (${b}) + thumbs (${c})`);

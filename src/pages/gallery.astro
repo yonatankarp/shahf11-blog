@@ -8,13 +8,21 @@ import { withBase } from '../lib/url';
 // The manifest lives at the repo root (gallery/photos.yaml). Photos are added there over
 // time by the family; when the list is empty we show a gentle placeholder.
 const manifestPath = path.join(process.cwd(), 'gallery', 'photos.yaml');
+const galleryDimensionsPath = path.join(process.cwd(), 'public', 'gallery-dimensions.json');
 let photos = [];
+let galleryDimensions = { photos: {}, thumbs: {} };
 try {
   const doc = loadYaml(fs.readFileSync(manifestPath, 'utf8'));
   photos = Array.isArray(doc?.photos) ? doc.photos : [];
 } catch {
   photos = [];
 }
+try {
+  galleryDimensions = JSON.parse(fs.readFileSync(galleryDimensionsPath, 'utf8'));
+} catch {
+  galleryDimensions = { photos: {}, thumbs: {} };
+}
+const dimensionsFor = (kind, file) => galleryDimensions[kind]?.[file] ?? {};
 ---
 <Base title="גלריה — חיה בסרט(ן)" description="תמונות של חיה." wide>
   <div class="gallery-page">
@@ -35,6 +43,8 @@ try {
                   src={index === 0 ? withBase(`gallery/photos/${p.file}`) : undefined}
                   data-src={index === 0 ? undefined : withBase(`gallery/photos/${p.file}`)}
                   alt={p.alt ?? p.caption ?? ''}
+                  width={dimensionsFor('photos', p.file).width}
+                  height={dimensionsFor('photos', p.file).height}
                   loading={index === 0 ? 'eager' : 'lazy'}
                   decoding="async"
                 />
@@ -50,7 +60,14 @@ try {
           {photos.map((p, index) => (
             <figure>
               <button type="button" class="gallery-thumb" data-gallery-index={index} aria-label={`פתחו תמונה ${index + 1} מתוך ${photos.length} במסך מלא`}>
-                <img src={withBase(`gallery/thumbs/${p.file}`)} alt={p.alt ?? p.caption ?? ''} loading="lazy" decoding="async" />
+                <img
+                  src={withBase(`gallery/thumbs/${p.file}`)}
+                  alt={p.alt ?? p.caption ?? ''}
+                  width={dimensionsFor('thumbs', p.file).width}
+                  height={dimensionsFor('thumbs', p.file).height}
+                  loading="lazy"
+                  decoding="async"
+                />
               </button>
               {p.caption && <figcaption>{p.caption}</figcaption>}
             </figure>
