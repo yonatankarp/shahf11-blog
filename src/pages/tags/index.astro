@@ -15,11 +15,22 @@ const searchKey = (t: (typeof tags)[number]) =>
 <Base title="חיפוש ותגיות — חיה בסרט(ן)" description="חיפוש בכל רשומות הבלוג, ועיון לפי בני משפחה ונושאים.">
   <div class="tags-index">
     <h1 class="disp">חיפוש ותגיות</h1>
-    <p class="eyebrow">חפשו כל מילה מהבלוג, או עיינו לפי בן משפחה ונושא</p>
+    <p id="search-help" class="eyebrow">חפשו כל מילה מהבלוג, או עיינו לפי בן משפחה ונושא</p>
     <label for="site-search" class="sr-only">חיפוש בכל הרשומות, וגם לפי שם, כינוי, תפקיד או נושא</label>
-    <input id="site-search" class="tag-filter" type="search" placeholder="חיפוש — מילה, שם, כינוי או נושא…" autocomplete="off" />
+    <input
+      id="site-search"
+      class="tag-filter"
+      type="search"
+      placeholder="חיפוש — מילה, שם, כינוי או נושא…"
+      autocomplete="off"
+      spellcheck="false"
+      enterkeyhint="search"
+      aria-describedby="search-help"
+      aria-controls="search-results"
+      aria-expanded="false"
+    />
 
-    <section id="search-results" class="search-results" data-index={withBase('search-index.json')} hidden>
+    <section id="search-results" class="search-results" data-index={withBase('search-index.json')} role="region" aria-label="תוצאות חיפוש" hidden>
       <p class="search-results__count" aria-live="polite"></p>
       <ul class="search-hits"></ul>
     </section>
@@ -82,7 +93,12 @@ const searchKey = (t: (typeof tags)[number]) =>
         const hay = el.getAttribute('data-search') || '';
         el.style.display = !q || hay.includes(q) ? '' : 'none';
       }
-      if (!q) { results.hidden = true; hitsEl.innerHTML = ''; return; }
+      if (!q) {
+        results.hidden = true;
+        hitsEl.innerHTML = '';
+        input.setAttribute('aria-expanded', 'false');
+        return;
+      }
       const idx = await ensureIndex();
       const matches = idx.filter((p) => p.text.includes(q));
       const shown = matches.slice(0, 50);
@@ -95,10 +111,12 @@ const searchKey = (t: (typeof tags)[number]) =>
         `<span class="search-hit__date">${esc(p.date)}</span>` +
         `<p class="search-hit__ex">${esc(p.excerpt)}</p></li>`).join('') +
         (matches.length > shown.length ? `<li class="search-hit__more">מוצגות ${shown.length} מתוך ${matches.length}. צמצמו את החיפוש.</li>` : '');
+      input.setAttribute('aria-expanded', 'true');
     }
 
     let debounceTimer;
     input?.addEventListener('input', () => {
+      if (!input.value.trim()) input.setAttribute('aria-expanded', 'false');
       window.clearTimeout(debounceTimer);
       debounceTimer = window.setTimeout(run, 150);
     });
