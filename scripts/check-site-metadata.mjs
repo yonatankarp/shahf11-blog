@@ -21,6 +21,7 @@
 //      belong in archival metadata only.
 //  13. every page has a canonical URL for its own built route, and social
 //      metadata points at that same canonical URL.
+//  14. social preview images are same-origin files that exist in dist/.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -95,6 +96,16 @@ function requireMeta(tags, rel, keys) {
   for (const key of keys) {
     if (!tags.has(key)) failures.push(`${rel}: missing social metadata: ${key}`);
   }
+}
+
+function requireLocalAssetUrl(rel, field, rawUrl) {
+  if (!rawUrl) return;
+  const target = localTargetForUrl(rawUrl);
+  if (!target) {
+    failures.push(`${rel}: ${field} should be a same-origin asset URL: ${rawUrl}`);
+    return;
+  }
+  if (!existsSync(target.targetPath)) failures.push(`${rel}: ${field} file missing in dist: ${rawUrl}`);
 }
 
 function localTargetForUrl(rawHref) {
@@ -218,6 +229,10 @@ for (const file of files) {
   if (metas.get('og:image')?.[0] !== metas.get('twitter:image')?.[0]) {
     failures.push(`${rel}: og:image and twitter:image differ`);
   }
+  requireLocalAssetUrl(rel, 'og:image', metas.get('og:image')?.[0]);
+  requireLocalAssetUrl(rel, 'og:image:secure_url', metas.get('og:image:secure_url')?.[0]);
+  requireLocalAssetUrl(rel, 'twitter:image', metas.get('twitter:image')?.[0]);
+  requireLocalAssetUrl(rel, 'itemprop image', metas.get('image')?.[0]);
   if (metas.get('og:type')?.[0] === 'article') {
     requireMeta(metas, rel, ['article:published_time', 'article:author', 'article:tag']);
   }
