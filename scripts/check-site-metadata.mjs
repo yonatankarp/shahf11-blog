@@ -33,6 +33,9 @@ const distDir = path.join(rootDir, 'dist');
 const SITE_ORIGIN = 'https://hayabesartan.com';
 // Empty at the apex root; local asset URLs are absolute-rooted (/images/…, /gallery/…).
 const BASE = '';
+// Deliberately wider than the four types Base.astro maps to og:image:type — this set
+// only answers "image, not a page". Whether a format also carries a type tag is the
+// separate og:image:type requirement below.
 const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif', '.svg']);
 
 if (!existsSync(distDir)) {
