@@ -23,7 +23,7 @@
 //      metadata points at that same canonical URL.
 //  14. social preview images are same-origin files that exist in dist/.
 import { readdir, readFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { load as loadYaml } from 'js-yaml';
@@ -33,6 +33,7 @@ const distDir = path.join(rootDir, 'dist');
 const SITE_ORIGIN = 'https://hayabesartan.com';
 // Empty at the apex root; local asset URLs are absolute-rooted (/images/…, /gallery/…).
 const BASE = '';
+const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif', '.svg']);
 
 if (!existsSync(distDir)) {
   console.error('dist/ not found — run `npm run build` first.');
@@ -98,6 +99,14 @@ function requireMeta(tags, rel, keys) {
   }
 }
 
+function isFile(targetPath) {
+  try {
+    return statSync(targetPath).isFile();
+  } catch {
+    return false;
+  }
+}
+
 function requireLocalAssetUrl(rel, field, rawUrl) {
   if (!rawUrl) return;
   const target = localTargetForUrl(rawUrl);
@@ -105,7 +114,13 @@ function requireLocalAssetUrl(rel, field, rawUrl) {
     failures.push(`${rel}: ${field} should be a same-origin asset URL: ${rawUrl}`);
     return;
   }
-  if (!existsSync(target.targetPath)) failures.push(`${rel}: ${field} file missing in dist: ${rawUrl}`);
+  // An extensionless URL resolves to a page (…/index.html), not an image — crawlers
+  // fetch this URL directly, so a route here ships a broken social preview.
+  if (!IMAGE_EXTENSIONS.has(path.extname(target.targetPath).toLowerCase())) {
+    failures.push(`${rel}: ${field} should point at an image file: ${rawUrl}`);
+    return;
+  }
+  if (!isFile(target.targetPath)) failures.push(`${rel}: ${field} file missing in dist: ${rawUrl}`);
 }
 
 function localTargetForUrl(rawHref) {
@@ -226,13 +241,20 @@ for (const file of files) {
   if (metas.get('twitter:card')?.[0] !== 'summary_large_image') {
     failures.push(`${rel}: twitter:card should be summary_large_image`);
   }
-  if (metas.get('og:image')?.[0] !== metas.get('twitter:image')?.[0]) {
+  // Every value matters, not just the first: a crawler may pick any repeated tag.
+  const ogImages = metas.get('og:image') ?? [];
+  const twitterImages = metas.get('twitter:image') ?? [];
+  if (ogImages.length !== twitterImages.length || ogImages.some((url, i) => url !== twitterImages[i])) {
     failures.push(`${rel}: og:image and twitter:image differ`);
   }
-  requireLocalAssetUrl(rel, 'og:image', metas.get('og:image')?.[0]);
-  requireLocalAssetUrl(rel, 'og:image:secure_url', metas.get('og:image:secure_url')?.[0]);
-  requireLocalAssetUrl(rel, 'twitter:image', metas.get('twitter:image')?.[0]);
-  requireLocalAssetUrl(rel, 'itemprop image', metas.get('image')?.[0]);
+  for (const [field, key] of [
+    ['og:image', 'og:image'],
+    ['og:image:secure_url', 'og:image:secure_url'],
+    ['twitter:image', 'twitter:image'],
+    ['itemprop image', 'image'],
+  ]) {
+    for (const rawUrl of metas.get(key) ?? []) requireLocalAssetUrl(rel, field, rawUrl);
+  }
   if (metas.get('og:type')?.[0] === 'article') {
     requireMeta(metas, rel, ['article:published_time', 'article:author', 'article:tag']);
   }
