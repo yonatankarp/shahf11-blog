@@ -25,6 +25,7 @@ const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
   headline: post.data.title,
+  description,
   datePublished: post.data.date.toISOString().slice(0, 10),
   inLanguage: 'he',
   author: { '@type': 'Person', name: 'חיה קרפ-צור' },

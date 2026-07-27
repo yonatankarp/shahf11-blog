@@ -22,6 +22,7 @@
 //  13. every page has a canonical URL for its own built route, and social
 //      metadata points at that same canonical URL.
 //  14. social preview images are same-origin files that exist in dist/.
+//  15. post structured data carries the same description crawlers see in meta tags.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -70,8 +71,17 @@ function stripNonMarkupBodies(html) {
 
 function attrValue(tag, attr) {
   const escaped = attr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = tag.match(new RegExp(`\\s${escaped}=["']([^"']+)["']`, 'i'));
-  return match?.[1]?.trim() ?? '';
+  const match = tag.match(new RegExp(`\\s${escaped}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`, 'i'));
+  return (match?.[1] ?? match?.[2] ?? '').trim();
+}
+
+function decodeHtmlAttr(value) {
+  return value
+    .replace(/&quot;|&#34;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
 }
 
 function metaTags(markup) {
@@ -91,6 +101,18 @@ function linkTags(markup, relName) {
   return [...markup.matchAll(/<link\b[^>]*>/gi)]
     .map((m) => m[0])
     .filter((tag) => attrValue(tag, 'rel').toLowerCase().split(/\s+/).includes(relName));
+}
+
+function jsonLdObjects(markup, rel) {
+  const objects = [];
+  for (const m of markup.matchAll(/<script\b[^>]*\btype=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+    try {
+      objects.push(JSON.parse(m[1].trim()));
+    } catch (error) {
+      failures.push(`${rel}: invalid JSON-LD: ${error.message}`);
+    }
+  }
+  return objects;
 }
 
 function requireMeta(tags, rel, keys) {
@@ -257,6 +279,12 @@ for (const file of files) {
   }
   if (metas.get('og:type')?.[0] === 'article') {
     requireMeta(metas, rel, ['article:published_time', 'article:author', 'article:tag']);
+    const blogPosting = jsonLdObjects(html, rel).find((data) => data?.['@type'] === 'BlogPosting');
+    if (!blogPosting) {
+      failures.push(`${rel}: missing BlogPosting JSON-LD`);
+    } else if (blogPosting.description !== decodeHtmlAttr(metas.get('description')?.[0] ?? '')) {
+      failures.push(`${rel}: BlogPosting JSON-LD description does not match meta description`);
+    }
   }
 
   for (const m of markup.matchAll(/<img\b[^>]*>/gi)) {
