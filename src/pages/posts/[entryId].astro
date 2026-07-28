@@ -68,8 +68,8 @@ const jsonLd = JSON.stringify({
       </section>
     )}
     <nav class="post-nav" aria-label="ניווט בין רשומות">
-      {older && olderUrl ? <a href={olderUrl} rel="prev" aria-label={`הרשומה הקודמת: ${older.data.title}`}>← {older.data.title}</a> : <span />}
-      {newer && newerUrl ? <a href={newerUrl} rel="next" aria-label={`הרשומה הבאה: ${newer.data.title}`}>{newer.data.title} →</a> : <span />}
+      {older && olderUrl ? <a href={olderUrl} rel="prev" aria-label={`הרשומה הקודמת: ${older.data.title}`}>{older.data.title} →</a> : <span />}
+      {newer && newerUrl ? <a href={newerUrl} rel="next" aria-label={`הרשומה הבאה: ${newer.data.title}`}>← {newer.data.title}</a> : <span />}
     </nav>
   </article>
 </Base>
