@@ -18,6 +18,10 @@ const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
   title={page.currentPage > 1 ? `${tag.label} · עמוד ${page.currentPage} — חיה בסרט(ן)` : `${tag.label} — חיה בסרט(ן)`}
   description={`רשומות מהבלוג עם התגית ${tag.label}.`}
 >
+  <Fragment slot="head">
+    {page.url.prev && <link rel="prev" href={page.url.prev} />}
+    {page.url.next && <link rel="next" href={page.url.next} />}
+  </Fragment>
   <div class="tag-page">
     <p class="eyebrow"><a href={withBase('tags')}>← כל התגיות</a></p>
     <h1 class="tag-page__title">{tag.label}</h1>
