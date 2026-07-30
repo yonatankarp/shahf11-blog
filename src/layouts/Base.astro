@@ -5,6 +5,7 @@ import '@fontsource/gveret-levin/400.css';
 import '@fontsource/heebo/700.css';
 import '../styles/global.css';
 import frankHebrewWoff2 from '@fontsource-variable/frank-ruhl-libre/files/frank-ruhl-libre-hebrew-wght-normal.woff2?url';
+import assistantHebrewWoff2 from '@fontsource-variable/assistant/files/assistant-hebrew-wght-normal.woff2?url';
 import gveretHebrewWoff2 from '@fontsource/gveret-levin/files/gveret-levin-hebrew-400-normal.woff2?url';
 import { withBase } from '../lib/url';
 import { heroPhotoFile } from '../lib/hero';
@@ -65,6 +66,7 @@ const nav = [
     <link rel="canonical" href={canonical} />
     <link rel="sitemap" href={withBase('sitemap-index.xml')} />
     <link rel="preload" as="font" type="font/woff2" href={frankHebrewWoff2} crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href={assistantHebrewWoff2} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={gveretHebrewWoff2} crossorigin />
     <meta property="og:title" content={title} />
     {description && <meta property="og:description" content={description} />}
