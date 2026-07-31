@@ -31,7 +31,7 @@ const searchKey = (t: (typeof tags)[number]) =>
     />
 
     <section id="search-results" class="search-results" data-index={withBase('search-index.json')} role="region" aria-label="תוצאות חיפוש" hidden>
-      <p class="search-results__count" aria-live="polite"></p>
+      <p class="search-results__count" role="status" aria-live="polite" aria-atomic="true"></p>
       <ul class="search-hits"></ul>
     </section>
 
