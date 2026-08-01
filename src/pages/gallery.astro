@@ -46,6 +46,7 @@ const dimensionsFor = (kind, file) => galleryDimensions[kind]?.[file] ?? {};
                   width={dimensionsFor('photos', p.file).width}
                   height={dimensionsFor('photos', p.file).height}
                   loading={index === 0 ? 'eager' : 'lazy'}
+                  fetchpriority={index === 0 ? 'high' : undefined}
                   decoding="async"
                 />
               </button>
