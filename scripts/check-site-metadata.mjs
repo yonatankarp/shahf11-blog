@@ -23,6 +23,7 @@
 //      metadata points at that same canonical URL.
 //  14. social preview images are same-origin files that exist in dist/.
 //  15. post structured data carries the same description crawlers see in meta tags.
+//  16. local video posters and source files resolve to built files.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -57,6 +58,7 @@ let imgCount = 0;
 let pdfCount = 0;
 let internalLinkCount = 0;
 let tapuzLinkCount = 0;
+let videoAssetCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -140,6 +142,20 @@ function requireLocalAssetUrl(rel, field, rawUrl) {
   // fetch this URL directly, so a route here ships a broken social preview.
   if (!IMAGE_EXTENSIONS.has(path.extname(target.targetPath).toLowerCase())) {
     failures.push(`${rel}: ${field} should point at an image file: ${rawUrl}`);
+    return;
+  }
+  if (!isFile(target.targetPath)) failures.push(`${rel}: ${field} file missing in dist: ${rawUrl}`);
+}
+
+function requireLocalBuiltFileUrl(rel, field, rawUrl) {
+  if (!rawUrl) return;
+  const target = localTargetForUrl(rawUrl);
+  if (!target) {
+    failures.push(`${rel}: ${field} should be a same-origin file URL: ${rawUrl}`);
+    return;
+  }
+  if (!path.extname(new URL(rawUrl, SITE_ORIGIN).pathname)) {
+    failures.push(`${rel}: ${field} should point at a file, not a page route: ${rawUrl}`);
     return;
   }
   if (!isFile(target.targetPath)) failures.push(`${rel}: ${field} file missing in dist: ${rawUrl}`);
@@ -322,6 +338,20 @@ for (const file of files) {
     }
   }
 
+  for (const m of markup.matchAll(/<video\b[^>]*>/gi)) {
+    const poster = attrValue(m[0], 'poster');
+    if (!poster) continue;
+    videoAssetCount += 1;
+    requireLocalAssetUrl(rel, 'video poster', poster);
+  }
+
+  for (const m of markup.matchAll(/<source\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)) {
+    const src = m[1];
+    if (!/(?:^|\/)video\//.test(src)) continue;
+    videoAssetCount += 1;
+    requireLocalBuiltFileUrl(rel, 'video source', src);
+  }
+
   for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+)["']/gi)) {
     const tag = m[0];
     const href = m[1];
@@ -381,5 +411,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
