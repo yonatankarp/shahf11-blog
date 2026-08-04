@@ -21,6 +21,7 @@ const extraImgs = post.data.images.filter((f) => !inlineImgs.some((s) => s === `
 const topic = (post.data.tags ?? []).map(getTag).find((t) => t.kind === 'topic');
 const description = excerpt(post.body ?? '');
 const socialTags = (post.data.tags ?? []).map((tag) => getTag(tag).label);
+const dateIso = post.data.date.toISOString().slice(0, 10);
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -47,7 +48,7 @@ const jsonLd = JSON.stringify({
   <article class="post">
     <div class="post__meta">
       {topic && <a class="cat" href={withBase(`tags/${topic.id}`)}>{topic.label}</a>}
-      <span class="eyebrow">{post.data.date_published}</span>
+      <time class="eyebrow" datetime={dateIso}>{post.data.date_published}</time>
     </div>
     <h1 class="post__title disp">{post.data.title}</h1>
     {truncated && (
