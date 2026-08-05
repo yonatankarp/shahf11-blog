@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // Source-side check: every image a post references (frontmatter `images:` or an
-// inline ![](images/…) body link) must exist as a file in images/. Runs before
-// the build, so authoring mistakes fail fast instead of shipping a broken <img>.
+// inline ![](images/…) body link) must exist as a file in images/. Every post
+// must also keep its matching scanned PDF in public/posts-pdf/. Runs before the
+// build, so authoring/provenance mistakes fail fast instead of shipping a broken
+// archive.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -10,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const contentDir = path.join(rootDir, 'content');
 const imagesDir = path.join(rootDir, 'images');
+const pdfDir = path.join(rootDir, 'public', 'posts-pdf');
 
 const toFilename = (ref) => {
   const clean = ref.split(/[?#]/, 1)[0];
@@ -43,6 +46,7 @@ const bodyImagePattern = /!\[[^\]]*\]\([ \t]*<?((?:\.\.\/)?images\/[^)\s>]+)>?/g
 
 const files = (await readdir(contentDir)).filter((f) => f.endsWith('.md')).sort();
 const missing = [];
+const missingPdfs = [];
 let refCount = 0;
 
 for (const file of files) {
@@ -59,6 +63,9 @@ for (const file of files) {
     refCount += 1;
     if (!existsSync(path.join(imagesDir, r))) missing.push(`${file}: ${r}`);
   }
+
+  const pdfFile = file.replace(/\.md$/, '.pdf');
+  if (!existsSync(path.join(pdfDir, pdfFile))) missingPdfs.push(`${file}: ${pdfFile}`);
 }
 
 if (missing.length > 0) {
@@ -67,4 +74,10 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-console.log(`All ${refCount} image references across ${files.length} posts exist in images/.`);
+if (missingPdfs.length > 0) {
+  console.error('Missing scanned PDFs for posts:');
+  for (const m of missingPdfs) console.error(`- ${m}`);
+  process.exit(1);
+}
+
+console.log(`All ${refCount} image references and ${files.length} scanned PDFs across ${files.length} posts exist.`);
