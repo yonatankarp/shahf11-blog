@@ -5,7 +5,7 @@
 // build, so authoring/provenance mistakes fail fast instead of shipping a broken
 // archive.
 import { readdir, readFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -65,7 +65,8 @@ for (const file of files) {
   }
 
   const pdfFile = file.replace(/\.md$/, '.pdf');
-  if (!existsSync(path.join(pdfDir, pdfFile))) missingPdfs.push(`${file}: ${pdfFile}`);
+  const pdfPath = path.join(pdfDir, pdfFile);
+  if (!existsSync(pdfPath) || !statSync(pdfPath).isFile()) missingPdfs.push(`${file}: ${pdfFile}`);
 }
 
 if (missing.length > 0) {
