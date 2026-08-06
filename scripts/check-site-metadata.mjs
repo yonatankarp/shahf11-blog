@@ -24,6 +24,7 @@
 //  14. social preview images are same-origin files that exist in dist/.
 //  15. post structured data carries the same description crawlers see in meta tags.
 //  16. local video posters and source files resolve to built files.
+//  17. head-level rel="prev"/"next" archive navigation resolves to built pages.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -213,6 +214,7 @@ for (const file of files) {
   const metas = metaTags(markup);
   const canonicalLinks = linkTags(markup, 'canonical');
   const sitemapLinks = linkTags(markup, 'sitemap');
+  const sequenceLinks = [...linkTags(markup, 'prev'), ...linkTags(markup, 'next')];
 
   const htmlTag = html.match(/<html\b[^>]*>/i)?.[0] ?? '';
   if (!/\blang=["']he["']/i.test(htmlTag) || !/\bdir=["']rtl["']/i.test(htmlTag)) {
@@ -254,6 +256,23 @@ for (const file of files) {
       const target = localTargetForUrl(href);
       if (!target || !existsSync(target.targetPath)) failures.push(`${rel}: sitemap link target missing: ${href}`);
     }
+  }
+
+  for (const tag of sequenceLinks) {
+    const href = attrValue(tag, 'href');
+    const relValues = attrValue(tag, 'rel').toLowerCase().split(/\s+/).filter(Boolean);
+    const relation = relValues.includes('prev') ? 'prev' : 'next';
+    const target = localTargetForUrl(href);
+    if (!target) {
+      failures.push(`${rel}: rel="${relation}" link should be same-origin: ${href}`);
+      continue;
+    }
+    if (target.hash) failures.push(`${rel}: rel="${relation}" link should not include a fragment: ${href}`);
+    if (path.extname(target.targetPath) !== '.html') {
+      failures.push(`${rel}: rel="${relation}" link should point at a page route: ${href}`);
+      continue;
+    }
+    if (!existsSync(target.targetPath)) failures.push(`${rel}: rel="${relation}" link target missing: ${href}`);
   }
 
   requireMeta(metas, rel, [
