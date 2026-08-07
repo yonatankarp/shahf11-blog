@@ -31,6 +31,11 @@ for (const [index, file] of manifestFiles.entries()) {
     failures.push(`manifest entry missing file: ${file}`);
   }
 
+  const accessibleLabel = `${photos[index]?.alt ?? photos[index]?.caption ?? ''}`.trim();
+  if (!accessibleLabel) {
+    failures.push(`manifest entry missing alt or caption text: ${file}`);
+  }
+
   const credit = photos[index]?.credit ?? '';
   if (/IMG_6539\.HEIC/i.test(`${file} ${credit}`)) {
     failures.push('IMG_6539.HEIC belongs to the homepage image, not the gallery manifest');
