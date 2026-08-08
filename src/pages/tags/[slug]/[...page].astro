@@ -13,6 +13,8 @@ export async function getStaticPaths({ paginate }) {
 const { page, tag } = Astro.props;
 const pageHref = (n) => withBase(n === 1 ? `tags/${tag.id}` : `tags/${tag.id}/${n}`);
 const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
+const olderPage = page.currentPage - 1;
+const newerPage = page.currentPage + 1;
 ---
 <Base
   title={page.currentPage > 1 ? `${tag.label} · עמוד ${page.currentPage} — חיה בסרט(ן)` : `${tag.label} — חיה בסרט(ן)`}
@@ -33,19 +35,19 @@ const pages = Array.from({ length: page.lastPage }, (_, i) => i + 1);
   {page.lastPage > 1 && (
     <nav class="pagination" aria-label="ניווט בין עמודי התגית">
       {page.url.prev
-        ? <a class="pagination__step" href={page.url.prev}>ישנים יותר →</a>
+        ? <a class="pagination__step" href={page.url.prev} rel="prev" aria-label={`עמוד ${olderPage} בתגית ${tag.label}: רשומות ישנות יותר`}>ישנים יותר →</a>
         : <span class="pagination__step is-disabled" aria-disabled="true">ישנים יותר →</span>}
       <ol class="pagination__pages">
         {pages.map((n) => (
           <li>
             {n === page.currentPage
-              ? <span class="pagination__page is-current" aria-current="page" aria-label={`עמוד ${n}`}>{n}</span>
-              : <a class="pagination__page" href={pageHref(n)} aria-label={`עמוד ${n}`}>{n}</a>}
+              ? <span class="pagination__page is-current" aria-current="page" aria-label={`העמוד הנוכחי בתגית ${tag.label}, עמוד ${n}`}>{n}</span>
+              : <a class="pagination__page" href={pageHref(n)} aria-label={`עמוד ${n} בתגית ${tag.label}`}>{n}</a>}
           </li>
         ))}
       </ol>
       {page.url.next
-        ? <a class="pagination__step" href={page.url.next}>← חדשים יותר</a>
+        ? <a class="pagination__step" href={page.url.next} rel="next" aria-label={`עמוד ${newerPage} בתגית ${tag.label}: רשומות חדשות יותר`}>← חדשים יותר</a>
         : <span class="pagination__step is-disabled" aria-disabled="true">← חדשים יותר</span>}
     </nav>
   )}
