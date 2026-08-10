@@ -209,7 +209,14 @@ a.cat:hover { filter: brightness(1.1); }
   font-family: var(--sans); font-weight: 600; font-size: .88rem;
   margin-block-start: 1.8rem;
 }
-.post-nav a { color: var(--red); text-decoration: none; max-inline-size: 46%; }
+.post-nav a {
+  color: var(--red); text-decoration: none; max-inline-size: 46%;
+  display: flex; flex-direction: column; gap: .15rem;
+}
+.post-nav__label {
+  color: var(--mut); font-size: .72rem; line-height: 1.2;
+}
+.post-nav__title { line-height: 1.35; }
 
 /* ---------------- tag chips (shared component) ---------------- */
 .tag-chips { list-style: none; display: flex; flex-wrap: wrap; gap: .45rem; margin: .7rem 0 0; padding: 0; }
