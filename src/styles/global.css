@@ -154,7 +154,7 @@ a.cat:hover { filter: brightness(1.1); }
 .post-card__title { font-family: var(--disp); font-size: 1.45rem; line-height: 1.18; margin: 0 0 .35rem; }
 .post-card__title a { color: var(--ink); text-decoration: none; transition: color .15s ease; }
 .post-card__title a:hover { color: var(--red); }
-.excerpt { margin: 0; color: #4a3b31; }
+.excerpt { margin: 0; color: #4a3b31; overflow-wrap: break-word; }
 .post-card__more { font-family: var(--sans); font-weight: 600; font-size: .82rem; color: var(--red); text-decoration: none; display: inline-block; margin-block-start: .5rem; }
 
 .pagination {
@@ -180,7 +180,7 @@ a.cat:hover { filter: brightness(1.1); }
 }
 .post__meta { display: flex; align-items: center; gap: .7rem; margin-block-end: .3rem; }
 .post__title { font-family: var(--disp); font-size: clamp(1.8rem, 5vw, 2.4rem); line-height: 1.1; margin: .1rem 0 .3rem; }
-.post__body { margin-block-start: 1.6rem; }
+.post__body { margin-block-start: 1.6rem; overflow-wrap: break-word; }
 .post__body p { margin: 0 0 1.2rem; }
 /* raised initial: the big red letter rises above the first line, and the rest of the
    line sits on its baseline (aligned to the letter's bottom, not its top) */
