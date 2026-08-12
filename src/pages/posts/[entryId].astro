@@ -1,5 +1,7 @@
 ---
 import { render } from 'astro:content';
+import fs from 'node:fs';
+import path from 'node:path';
 import Base from '../../layouts/Base.astro';
 import TagChips from '../../components/TagChips.astro';
 import { getTag } from '../../lib/tags';
@@ -22,6 +24,14 @@ const topic = (post.data.tags ?? []).map(getTag).find((t) => t.kind === 'topic')
 const description = excerpt(post.body ?? '');
 const socialTags = (post.data.tags ?? []).map((tag) => getTag(tag).label);
 const dateIso = post.data.date.toISOString().slice(0, 10);
+const imageDimensionsPath = path.join(process.cwd(), 'public', 'images-dimensions.json');
+let imageDimensions = {};
+try {
+  imageDimensions = JSON.parse(fs.readFileSync(imageDimensionsPath, 'utf8'));
+} catch {
+  imageDimensions = {};
+}
+const dimensionsFor = (file) => imageDimensions[file] ?? {};
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -58,7 +68,16 @@ const jsonLd = JSON.stringify({
     )}
     {extraImgs.length > 0 && (
       <section class="gallery gallery--lead">
-        {extraImgs.map((f) => <img src={withBase(`images/${f}`)} alt={`תמונה מתוך "${post.data.title}"`} loading="lazy" decoding="async" />)}
+        {extraImgs.map((f) => (
+          <img
+            src={withBase(`images/${f}`)}
+            alt={`תמונה מתוך "${post.data.title}"`}
+            width={dimensionsFor(f).width}
+            height={dimensionsFor(f).height}
+            loading="lazy"
+            decoding="async"
+          />
+        ))}
       </section>
     )}
     <div class="post__body"><Content /></div>
