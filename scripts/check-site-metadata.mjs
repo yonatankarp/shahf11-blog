@@ -25,6 +25,7 @@
 //  15. post structured data carries the same description crawlers see in meta tags.
 //  16. local video posters and source files resolve to built files.
 //  17. head-level rel="prev"/"next" archive navigation resolves to built pages.
+//  18. each page advertises a local favicon asset that exists in dist/.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -60,6 +61,7 @@ let pdfCount = 0;
 let internalLinkCount = 0;
 let tapuzLinkCount = 0;
 let videoAssetCount = 0;
+let iconLinkCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -214,6 +216,7 @@ for (const file of files) {
   const metas = metaTags(markup);
   const canonicalLinks = linkTags(markup, 'canonical');
   const sitemapLinks = linkTags(markup, 'sitemap');
+  const iconLinks = linkTags(markup, 'icon');
   const sequenceLinks = [...linkTags(markup, 'prev'), ...linkTags(markup, 'next')];
 
   const htmlTag = html.match(/<html\b[^>]*>/i)?.[0] ?? '';
@@ -255,6 +258,15 @@ for (const file of files) {
       const href = attrValue(tag, 'href');
       const target = localTargetForUrl(href);
       if (!target || !existsSync(target.targetPath)) failures.push(`${rel}: sitemap link target missing: ${href}`);
+    }
+  }
+
+  if (iconLinks.length < 1) {
+    failures.push(`${rel}: missing favicon link`);
+  } else {
+    for (const tag of iconLinks) {
+      iconLinkCount += 1;
+      requireLocalAssetUrl(rel, 'favicon link', attrValue(tag, 'href'));
     }
   }
 
@@ -430,5 +442,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
