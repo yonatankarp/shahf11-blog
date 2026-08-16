@@ -6,6 +6,15 @@ import { withBase } from '../lib/url';
 // Prebuilt client-side search index: one entry per post. `text` is the lowercased haystack
 // (title + body + tag labels/aliases) so the on-page search matches any word in the blog,
 // not just tag names. Served static at <base>/search-index.json.
+const normalizeSearchText = (value: string) => value
+  .normalize('NFKC')
+  .toLowerCase()
+  .replace(/[\u0591-\u05bd\u05bf-\u05c7]/g, '')
+  .replace(/["'״׳]/g, '')
+  .replace(/[-־–—]/g, ' ')
+  .replace(/[^\p{Letter}\p{Number}]+/gu, ' ')
+  .trim();
+
 export const GET: APIRoute = async () => {
   const posts = await getAllPosts();
   const data = posts.map((p) => {
@@ -20,7 +29,7 @@ export const GET: APIRoute = async () => {
       date: p.data.date_published,
       url: withBase(`posts/${p.data.entryId}`),
       excerpt: excerpt(p.body ?? ''),
-      text: `${p.data.title} ${body} ${tagText}`.toLowerCase(),
+      text: normalizeSearchText(`${p.data.title} ${body} ${tagText}`),
     };
   });
   return new Response(JSON.stringify(data), {
