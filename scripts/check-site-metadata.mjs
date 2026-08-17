@@ -26,6 +26,8 @@
 //  16. local video posters and source files resolve to built files.
 //  17. head-level rel="prev"/"next" archive navigation resolves to built pages.
 //  18. each page advertises a local favicon asset that exists in dist/.
+//  19. the search page has an explicit failed-index-load status, not a silent
+//      empty-result fallback.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -268,6 +270,10 @@ for (const file of files) {
       iconLinkCount += 1;
       requireLocalAssetUrl(rel, 'favicon link', attrValue(tag, 'href'));
     }
+  }
+
+  if (rel === path.join('tags', 'index.html') && !html.includes('החיפוש אינו זמין כרגע')) {
+    failures.push(`${rel}: missing explicit search-index failure status`);
   }
 
   for (const tag of sequenceLinks) {
