@@ -77,6 +77,7 @@ const searchKey = (t: (typeof tags)[number]) =>
     const tagItems = browse.querySelectorAll('[data-search]');
     const indexUrl = results.getAttribute('data-index');
     let index = null;
+    let indexLoadFailed = false;
 
     const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -90,7 +91,16 @@ const searchKey = (t: (typeof tags)[number]) =>
       .trim();
 
     async function ensureIndex() {
-      if (!index) index = await fetch(indexUrl).then((r) => r.json()).catch(() => []);
+      if (index) return index;
+      try {
+        const response = await fetch(indexUrl);
+        if (!response.ok) throw new Error(`search index ${response.status}`);
+        index = await response.json();
+        indexLoadFailed = false;
+      } catch {
+        indexLoadFailed = true;
+        index = null;
+      }
       return index;
     }
 
@@ -109,6 +119,13 @@ const searchKey = (t: (typeof tags)[number]) =>
         return;
       }
       const idx = await ensureIndex();
+      if (indexLoadFailed) {
+        results.hidden = false;
+        countEl.textContent = 'החיפוש אינו זמין כרגע. נסו לרענן את העמוד.';
+        hitsEl.innerHTML = '';
+        input.setAttribute('aria-expanded', 'true');
+        return;
+      }
       const matches = idx.filter((p) => p.text.includes(q));
       const shown = matches.slice(0, 50);
       results.hidden = false;
