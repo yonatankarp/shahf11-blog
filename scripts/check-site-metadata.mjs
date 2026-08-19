@@ -28,11 +28,13 @@
 //  18. each page advertises a local favicon asset that exists in dist/.
 //  19. the search page has an explicit failed-index-load status, not a silent
 //      empty-result fallback.
+//  20. social preview image dimensions match the actual same-origin image.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { load as loadYaml } from 'js-yaml';
+import sharp from 'sharp';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const distDir = path.join(rootDir, 'dist');
@@ -64,6 +66,7 @@ let internalLinkCount = 0;
 let tapuzLinkCount = 0;
 let videoAssetCount = 0;
 let iconLinkCount = 0;
+let socialImageDimensionCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -150,6 +153,28 @@ function requireLocalAssetUrl(rel, field, rawUrl) {
     return;
   }
   if (!isFile(target.targetPath)) failures.push(`${rel}: ${field} file missing in dist: ${rawUrl}`);
+}
+
+async function requireSocialImageDimensions(rel, rawUrl, widthValue, heightValue) {
+  const target = localTargetForUrl(rawUrl);
+  if (!target || !isFile(target.targetPath)) return;
+
+  const declaredWidth = Number(widthValue);
+  const declaredHeight = Number(heightValue);
+  if (!Number.isInteger(declaredWidth) || !Number.isInteger(declaredHeight) || declaredWidth <= 0 || declaredHeight <= 0) {
+    failures.push(`${rel}: og:image dimensions should be positive integers: ${rawUrl}`);
+    return;
+  }
+
+  try {
+    const metadata = await sharp(target.targetPath).metadata();
+    socialImageDimensionCount += 1;
+    if (metadata.width !== declaredWidth || metadata.height !== declaredHeight) {
+      failures.push(`${rel}: og:image dimensions ${declaredWidth}x${declaredHeight} do not match ${metadata.width}x${metadata.height}: ${rawUrl}`);
+    }
+  } catch (error) {
+    failures.push(`${rel}: could not read og:image dimensions: ${rawUrl}: ${error.message}`);
+  }
 }
 
 function requireLocalBuiltFileUrl(rel, field, rawUrl) {
@@ -322,6 +347,14 @@ for (const file of files) {
   if (ogImages.length !== twitterImages.length || ogImages.some((url, i) => url !== twitterImages[i])) {
     failures.push(`${rel}: og:image and twitter:image differ`);
   }
+  const ogImageWidths = metas.get('og:image:width') ?? [];
+  const ogImageHeights = metas.get('og:image:height') ?? [];
+  if (ogImages.length !== ogImageWidths.length || ogImages.length !== ogImageHeights.length) {
+    failures.push(`${rel}: og:image dimensions count does not match og:image count`);
+  }
+  for (let i = 0; i < ogImages.length; i += 1) {
+    await requireSocialImageDimensions(rel, ogImages[i], ogImageWidths[i], ogImageHeights[i]);
+  }
   for (const [field, key] of [
     ['og:image', 'og:image'],
     ['og:image:secure_url', 'og:image:secure_url'],
@@ -448,5 +481,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
