@@ -8,6 +8,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { load as loadYaml } from 'js-yaml';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const contentDir = path.join(rootDir, 'content');
@@ -20,26 +21,17 @@ const toFilename = (ref) => {
   return m ? m[1] : clean;
 };
 
-const frontMatterImages = (fm) => {
-  const line = fm.match(/^images:[ \t]*(.*)$/m);
-  if (!line) return [];
-  const inline = line[1].trim();
-  if (inline.startsWith('[')) {
-    return inline
-      .replace(/^\[|\]$/g, '')
-      .split(',')
-      .map((s) => s.trim().replace(/^["']|["']$/g, ''))
-      .filter(Boolean);
+const frontMatterImages = (fm, file) => {
+  if (!fm.trim()) return [];
+  let frontmatter;
+  try {
+    frontmatter = loadYaml(fm) ?? {};
+  } catch (error) {
+    throw new Error(`${file}: invalid frontmatter YAML: ${error.message}`);
   }
-  // YAML block list on the lines following `images:`
-  const after = fm.slice(fm.indexOf(line[0]) + line[0].length);
-  const items = [];
-  for (const l of after.split(/\r?\n/)) {
-    const im = l.match(/^[ \t]*-[ \t]*(.+?)[ \t]*$/);
-    if (im) items.push(im[1].replace(/^["']|["']$/g, ''));
-    else if (l.trim() && !/^[ \t]/.test(l)) break; // next top-level key
-  }
-  return items;
+  const images = frontmatter.images ?? [];
+  if (!Array.isArray(images)) throw new Error(`${file}: frontmatter images must be a YAML list`);
+  return images.map(String).filter(Boolean);
 };
 
 const bodyImagePattern = /!\[[^\]]*\]\([ \t]*<?((?:\.\.\/)?images\/[^)\s>]+)>?/g;
@@ -56,7 +48,7 @@ for (const file of files) {
   const body = fmMatch ? fmMatch[2] : content;
 
   const refs = new Set();
-  for (const f of frontMatterImages(fm)) refs.add(toFilename(f));
+  for (const f of frontMatterImages(fm, file)) refs.add(toFilename(f));
   for (const m of body.matchAll(bodyImagePattern)) refs.add(toFilename(m[1]));
 
   for (const r of refs) {
