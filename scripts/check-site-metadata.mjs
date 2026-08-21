@@ -29,6 +29,7 @@
 //  19. the search page has an explicit failed-index-load status, not a silent
 //      empty-result fallback.
 //  20. social preview image dimensions match the actual same-origin image.
+//  21. the sitemap discovery link declares its XML media type.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -283,6 +284,8 @@ for (const file of files) {
   } else {
     for (const tag of sitemapLinks) {
       const href = attrValue(tag, 'href');
+      const type = attrValue(tag, 'type').toLowerCase();
+      if (type !== 'application/xml') failures.push(`${rel}: sitemap link should declare type="application/xml": ${href}`);
       const target = localTargetForUrl(href);
       if (!target || !existsSync(target.targetPath)) failures.push(`${rel}: sitemap link target missing: ${href}`);
     }
