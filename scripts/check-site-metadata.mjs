@@ -30,6 +30,7 @@
 //      empty-result fallback.
 //  20. social preview image dimensions match the actual same-origin image.
 //  21. the sitemap discovery link declares its XML media type.
+//  22. post JSON-LD URLs match the page canonical URL.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -246,6 +247,7 @@ for (const file of files) {
   const sitemapLinks = linkTags(markup, 'sitemap');
   const iconLinks = linkTags(markup, 'icon');
   const sequenceLinks = [...linkTags(markup, 'prev'), ...linkTags(markup, 'next')];
+  let canonicalHref = null;
 
   const htmlTag = html.match(/<html\b[^>]*>/i)?.[0] ?? '';
   if (!/\blang=["']he["']/i.test(htmlTag) || !/\bdir=["']rtl["']/i.test(htmlTag)) {
@@ -260,6 +262,7 @@ for (const file of files) {
     failures.push(`${rel}: expected exactly one canonical link, found ${canonicalLinks.length}`);
   } else {
     const href = attrValue(canonicalLinks[0], 'href');
+    canonicalHref = href;
     let canonicalUrl = null;
     try {
       canonicalUrl = new URL(href);
@@ -373,6 +376,8 @@ for (const file of files) {
       failures.push(`${rel}: missing BlogPosting JSON-LD`);
     } else if (blogPosting.description !== decodeHtmlAttr(metas.get('description')?.[0] ?? '')) {
       failures.push(`${rel}: BlogPosting JSON-LD description does not match meta description`);
+    } else if (canonicalHref && blogPosting.url !== canonicalHref) {
+      failures.push(`${rel}: BlogPosting JSON-LD URL does not match canonical URL`);
     }
   }
 
