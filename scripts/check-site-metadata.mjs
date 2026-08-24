@@ -31,6 +31,7 @@
 //  20. social preview image dimensions match the actual same-origin image.
 //  21. the sitemap discovery link declares its XML media type.
 //  22. post JSON-LD URLs match the page canonical URL.
+//  23. robots.txt advertises the built sitemap with the canonical site origin.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -480,6 +481,17 @@ const galleryImageCount = new Set(
 if (galleryImageCount !== expectedPhotos) failures.push(`gallery page expected ${expectedPhotos} photos, found ${galleryImageCount}`);
 for (const requiredClass of ['gallery-carousel', 'gallery-lightbox', 'data-gallery-index']) {
   if (!galleryHtml.includes(requiredClass)) failures.push(`gallery page missing ${requiredClass}`);
+}
+
+const robotsPath = path.join(distDir, 'robots.txt');
+if (!existsSync(robotsPath)) {
+  failures.push('robots.txt missing from dist');
+} else {
+  const robots = await readFile(robotsPath, 'utf8');
+  const sitemapUrl = `${SITE_ORIGIN}/sitemap-index.xml`;
+  if (!new RegExp(`^Sitemap:\\s*${sitemapUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'm').test(robots)) {
+    failures.push(`robots.txt missing canonical sitemap directive: ${sitemapUrl}`);
+  }
 }
 
 if (failures.length > 0) {
