@@ -32,6 +32,8 @@
 //  21. the sitemap discovery link declares its XML media type.
 //  22. post JSON-LD URLs match the page canonical URL.
 //  23. robots.txt advertises the built sitemap with the canonical site origin.
+//  24. every page keeps a skip-to-content link pointing at a focusable main
+//      landmark.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -253,6 +255,20 @@ for (const file of files) {
   const htmlTag = html.match(/<html\b[^>]*>/i)?.[0] ?? '';
   if (!/\blang=["']he["']/i.test(htmlTag) || !/\bdir=["']rtl["']/i.test(htmlTag)) {
     failures.push(`${rel}: <html> missing lang="he" dir="rtl"`);
+  }
+
+  const hasSkipLink = [...markup.matchAll(/<a\b[^>]*>/gi)].some((m) => {
+    const tag = m[0];
+    return attrValue(tag, 'class').split(/\s+/).includes('skip-link') && attrValue(tag, 'href') === '#main';
+  });
+  const hasFocusableMain = [...markup.matchAll(/<main\b[^>]*>/gi)].some((m) => (
+    attrValue(m[0], 'id') === 'main' && attrValue(m[0], 'tabindex') === '-1'
+  ));
+  if (!hasSkipLink) {
+    failures.push(`${rel}: missing skip-to-content link to #main`);
+  }
+  if (!hasFocusableMain) {
+    failures.push(`${rel}: missing focusable main landmark`);
   }
 
   const title = html.match(/<title>([\s\S]*?)<\/title>/i);
