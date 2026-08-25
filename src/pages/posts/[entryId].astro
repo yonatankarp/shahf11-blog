@@ -5,7 +5,7 @@ import path from 'node:path';
 import Base from '../../layouts/Base.astro';
 import TagChips from '../../components/TagChips.astro';
 import { getTag } from '../../lib/tags';
-import { getAllPosts, getAdjacent, excerpt } from '../../lib/posts';
+import { getAllPosts, getAdjacent, excerpt, publishedDateTime } from '../../lib/posts';
 import { withBase } from '../../lib/url';
 
 export async function getStaticPaths() {
@@ -23,7 +23,7 @@ const extraImgs = post.data.images.filter((f) => !inlineImgs.some((s) => s === `
 const topic = (post.data.tags ?? []).map(getTag).find((t) => t.kind === 'topic');
 const description = excerpt(post.body ?? '');
 const socialTags = (post.data.tags ?? []).map((tag) => getTag(tag).label);
-const dateIso = post.data.date.toISOString().slice(0, 10);
+const dateTime = publishedDateTime(post);
 const imageDimensionsPath = path.join(process.cwd(), 'public', 'images-dimensions.json');
 let imageDimensions = {};
 try {
@@ -37,7 +37,7 @@ const jsonLd = JSON.stringify({
   '@type': 'BlogPosting',
   headline: post.data.title,
   description,
-  datePublished: post.data.date.toISOString().slice(0, 10),
+  datePublished: dateTime,
   inLanguage: 'he',
   author: { '@type': 'Person', name: 'חיה קרפ-צור' },
   url: new URL(`${Astro.url.pathname.replace(/\/$/, '')}/`, Astro.site).href,
@@ -47,7 +47,7 @@ const jsonLd = JSON.stringify({
   title={`${post.data.title} — חיה בסרט(ן)`}
   description={description}
   ogType="article"
-  articlePublishedTime={post.data.date.toISOString()}
+  articlePublishedTime={dateTime}
   articleTags={socialTags}
 >
   <Fragment slot="head">
@@ -58,7 +58,7 @@ const jsonLd = JSON.stringify({
   <article class="post">
     <div class="post__meta">
       {topic && <a class="cat" href={withBase(`tags/${topic.id}`)}>{topic.label}</a>}
-      <time class="eyebrow" datetime={dateIso}>{post.data.date_published}</time>
+      <time class="eyebrow" datetime={dateTime}>{post.data.date_published}</time>
     </div>
     <h1 class="post__title disp">{post.data.title}</h1>
     {truncated && (

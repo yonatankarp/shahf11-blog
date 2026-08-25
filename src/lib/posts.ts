@@ -32,3 +32,10 @@ export function excerpt(body: string, words = 30): string {
   const parts = text.split(' ');
   return parts.length <= words ? text : parts.slice(0, words).join(' ') + '…';
 }
+
+export function publishedDateTime(post: PostEntry): string {
+  const dateIso = post.data.date.toISOString().slice(0, 10);
+  const time = post.data.date_published.match(/(\d{1,2}):(\d{2})\s*$/);
+  if (!time) return dateIso;
+  return `${dateIso}T${time[1].padStart(2, '0')}:${time[2]}`;
+}

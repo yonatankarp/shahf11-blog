@@ -34,6 +34,7 @@
 //  23. robots.txt advertises the built sitemap with the canonical site origin.
 //  24. every page keeps a skip-to-content link pointing at a focusable main
 //      landmark.
+//  25. post publish times keep the visible Hebrew time in machine-readable metadata.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -388,6 +389,16 @@ for (const file of files) {
   }
   if (metas.get('og:type')?.[0] === 'article') {
     requireMeta(metas, rel, ['article:published_time', 'article:author', 'article:tag']);
+    const articlePublishedTime = metas.get('article:published_time')?.[0] ?? '';
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(articlePublishedTime)) {
+      failures.push(`${rel}: article:published_time should include the visible publish time: ${articlePublishedTime}`);
+    }
+    const visibleTimeTag = markup.match(/<time\b[^>]*class=["'][^"']*\beyebrow\b[^"']*["'][^>]*>/i)?.[0];
+    if (!visibleTimeTag) {
+      failures.push(`${rel}: missing visible post publish time`);
+    } else if (attrValue(visibleTimeTag, 'datetime') !== articlePublishedTime) {
+      failures.push(`${rel}: visible publish datetime does not match article:published_time`);
+    }
     const blogPosting = jsonLdObjects(html, rel).find((data) => data?.['@type'] === 'BlogPosting');
     if (!blogPosting) {
       failures.push(`${rel}: missing BlogPosting JSON-LD`);
@@ -395,6 +406,8 @@ for (const file of files) {
       failures.push(`${rel}: BlogPosting JSON-LD description does not match meta description`);
     } else if (canonicalHref && blogPosting.url !== canonicalHref) {
       failures.push(`${rel}: BlogPosting JSON-LD URL does not match canonical URL`);
+    } else if (blogPosting.datePublished !== articlePublishedTime) {
+      failures.push(`${rel}: BlogPosting JSON-LD datePublished does not match article:published_time`);
     }
   }
 
