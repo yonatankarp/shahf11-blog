@@ -35,6 +35,8 @@
 //  24. every page keeps a skip-to-content link pointing at a focusable main
 //      landmark.
 //  25. post publish times keep the visible Hebrew time in machine-readable metadata.
+//  26. archive cards keep the visible Hebrew publish time in machine-readable
+//      <time> metadata too.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -73,6 +75,7 @@ let tapuzLinkCount = 0;
 let videoAssetCount = 0;
 let iconLinkCount = 0;
 let socialImageDimensionCount = 0;
+let postCardTimeCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -234,6 +237,10 @@ function isTapuzUrl(rawHref) {
   } catch {
     return false;
   }
+}
+
+function visiblePublishTime(text) {
+  return text.match(/(\d{1,2}):(\d{2})\s*$/)?.slice(1, 3).join(':') ?? null;
 }
 
 for (const file of files) {
@@ -433,6 +440,19 @@ for (const file of files) {
     }
   }
 
+  for (const m of markup.matchAll(/<time\b[^>]*class=["'][^"']*\bpost-card__date\b[^"']*["'][^>]*>([\s\S]*?)<\/time>/gi)) {
+    postCardTimeCount += 1;
+    const tag = m[0];
+    const dateTime = attrValue(tag, 'datetime');
+    const machineTime = dateTime.match(/^\d{4}-\d{2}-\d{2}T(\d{2}):(\d{2})$/)?.slice(1, 3).join(':') ?? null;
+    const visibleTime = visiblePublishTime(m[1].replace(/<[^>]*>/g, ''));
+    if (!machineTime) {
+      failures.push(`${rel}: post card datetime should include date and visible publish time: ${dateTime}`);
+    } else if (visibleTime && machineTime !== visibleTime.padStart(5, '0')) {
+      failures.push(`${rel}: post card datetime ${dateTime} does not match visible time ${visibleTime}`);
+    }
+  }
+
   for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+\.pdf)["']/gi)) {
     const href = m[1];
     if (!href.includes('/posts-pdf/') && !href.includes('/book/')) continue;
@@ -500,6 +520,7 @@ const postCount = existsSync(postsDir)
   ? (await readdir(postsDir, { withFileTypes: true })).filter((d) => d.isDirectory()).length
   : 0;
 if (postCount < 1) failures.push('no post pages generated under dist/posts/');
+if (postCardTimeCount < 1) failures.push('no archive post-card publish times found');
 
 const manifest = loadYaml(await readFile(path.join(rootDir, 'gallery', 'photos.yaml'), 'utf8'));
 const expectedPhotos = Array.isArray(manifest?.photos) ? manifest.photos.length : 0;
@@ -530,5 +551,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
