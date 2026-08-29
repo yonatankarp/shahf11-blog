@@ -37,6 +37,7 @@
 //  25. post publish times keep the visible Hebrew time in machine-readable metadata.
 //  26. archive cards keep the visible Hebrew publish time in machine-readable
 //      <time> metadata too.
+//  27. post JSON-LD headlines match the visible post title.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -76,6 +77,7 @@ let videoAssetCount = 0;
 let iconLinkCount = 0;
 let socialImageDimensionCount = 0;
 let postCardTimeCount = 0;
+let postJsonLdHeadlineCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -101,6 +103,10 @@ function decodeHtmlAttr(value) {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&');
+}
+
+function decodeHtmlText(value) {
+  return decodeHtmlAttr(value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim());
 }
 
 function metaTags(markup) {
@@ -409,12 +415,24 @@ for (const file of files) {
     const blogPosting = jsonLdObjects(html, rel).find((data) => data?.['@type'] === 'BlogPosting');
     if (!blogPosting) {
       failures.push(`${rel}: missing BlogPosting JSON-LD`);
-    } else if (blogPosting.description !== decodeHtmlAttr(metas.get('description')?.[0] ?? '')) {
-      failures.push(`${rel}: BlogPosting JSON-LD description does not match meta description`);
-    } else if (canonicalHref && blogPosting.url !== canonicalHref) {
-      failures.push(`${rel}: BlogPosting JSON-LD URL does not match canonical URL`);
-    } else if (blogPosting.datePublished !== articlePublishedTime) {
-      failures.push(`${rel}: BlogPosting JSON-LD datePublished does not match article:published_time`);
+    } else {
+      const visiblePostTitle = markup.match(/<h1\b[^>]*class=["'][^"']*\bpost__title\b[^"']*["'][^>]*>([\s\S]*?)<\/h1>/i);
+      if (!visiblePostTitle) {
+        failures.push(`${rel}: missing visible post title`);
+      } else {
+        postJsonLdHeadlineCount += 1;
+        const headline = decodeHtmlText(visiblePostTitle[1]);
+        if (blogPosting.headline !== headline) {
+          failures.push(`${rel}: BlogPosting JSON-LD headline does not match visible post title`);
+        }
+      }
+      if (blogPosting.description !== decodeHtmlAttr(metas.get('description')?.[0] ?? '')) {
+        failures.push(`${rel}: BlogPosting JSON-LD description does not match meta description`);
+      } else if (canonicalHref && blogPosting.url !== canonicalHref) {
+        failures.push(`${rel}: BlogPosting JSON-LD URL does not match canonical URL`);
+      } else if (blogPosting.datePublished !== articlePublishedTime) {
+        failures.push(`${rel}: BlogPosting JSON-LD datePublished does not match article:published_time`);
+      }
     }
   }
 
@@ -521,6 +539,9 @@ const postCount = existsSync(postsDir)
   : 0;
 if (postCount < 1) failures.push('no post pages generated under dist/posts/');
 if (postCardTimeCount < 1) failures.push('no archive post-card publish times found');
+if (postJsonLdHeadlineCount !== postCount) {
+  failures.push(`expected ${postCount} post JSON-LD headline checks, found ${postJsonLdHeadlineCount}`);
+}
 
 const manifest = loadYaml(await readFile(path.join(rootDir, 'gallery', 'photos.yaml'), 'utf8'));
 const expectedPhotos = Array.isArray(manifest?.photos) ? manifest.photos.length : 0;
@@ -551,5 +572,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
