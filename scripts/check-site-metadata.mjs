@@ -32,8 +32,8 @@
 //  21. the sitemap discovery link declares its XML media type.
 //  22. post JSON-LD URLs match the page canonical URL.
 //  23. robots.txt advertises the built sitemap with the canonical site origin.
-//  24. every page keeps a skip-to-content link pointing at a focusable main
-//      landmark.
+//  24. every page keeps exactly one skip-to-content link pointing at exactly
+//      one focusable main landmark.
 //  25. post publish times keep the visible Hebrew time in machine-readable metadata.
 //  26. archive cards keep the visible Hebrew publish time in machine-readable
 //      <time> metadata too.
@@ -78,6 +78,7 @@ let iconLinkCount = 0;
 let socialImageDimensionCount = 0;
 let postCardTimeCount = 0;
 let postJsonLdHeadlineCount = 0;
+let skipMainCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -271,18 +272,21 @@ for (const file of files) {
     failures.push(`${rel}: <html> missing lang="he" dir="rtl"`);
   }
 
-  const hasSkipLink = [...markup.matchAll(/<a\b[^>]*>/gi)].some((m) => {
+  const skipLinks = [...markup.matchAll(/<a\b[^>]*>/gi)].filter((m) => {
     const tag = m[0];
     return attrValue(tag, 'class').split(/\s+/).includes('skip-link') && attrValue(tag, 'href') === '#main';
   });
-  const hasFocusableMain = [...markup.matchAll(/<main\b[^>]*>/gi)].some((m) => (
+  const focusableMains = [...markup.matchAll(/<main\b[^>]*>/gi)].filter((m) => (
     attrValue(m[0], 'id') === 'main' && attrValue(m[0], 'tabindex') === '-1'
   ));
-  if (!hasSkipLink) {
-    failures.push(`${rel}: missing skip-to-content link to #main`);
+  if (skipLinks.length !== 1) {
+    failures.push(`${rel}: expected exactly one skip-to-content link to #main, found ${skipLinks.length}`);
   }
-  if (!hasFocusableMain) {
-    failures.push(`${rel}: missing focusable main landmark`);
+  if (focusableMains.length !== 1) {
+    failures.push(`${rel}: expected exactly one focusable main landmark, found ${focusableMains.length}`);
+  }
+  if (skipLinks.length === 1 && focusableMains.length === 1) {
+    skipMainCount += 1;
   }
 
   const title = html.match(/<title>([\s\S]*?)<\/title>/i);
@@ -572,5 +576,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${skipMainCount} skip/main landmarks, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
