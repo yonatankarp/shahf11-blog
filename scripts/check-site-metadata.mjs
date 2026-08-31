@@ -38,6 +38,8 @@
 //  26. archive cards keep the visible Hebrew publish time in machine-readable
 //      <time> metadata too.
 //  27. post JSON-LD headlines match the visible post title.
+//  28. the client-side search index has one entry per post and every entry links
+//      to a built post page.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -79,6 +81,7 @@ let socialImageDimensionCount = 0;
 let postCardTimeCount = 0;
 let postJsonLdHeadlineCount = 0;
 let skipMainCount = 0;
+let searchIndexEntryCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -547,6 +550,54 @@ if (postJsonLdHeadlineCount !== postCount) {
   failures.push(`expected ${postCount} post JSON-LD headline checks, found ${postJsonLdHeadlineCount}`);
 }
 
+const searchIndexPath = path.join(distDir, 'search-index.json');
+if (!existsSync(searchIndexPath)) {
+  failures.push('search-index.json missing from dist');
+} else {
+  try {
+    const searchIndex = JSON.parse(await readFile(searchIndexPath, 'utf8'));
+    if (!Array.isArray(searchIndex)) {
+      failures.push('search-index.json should contain an array');
+    } else {
+      searchIndexEntryCount = searchIndex.length;
+      if (searchIndexEntryCount !== postCount) {
+        failures.push(`search-index.json expected ${postCount} entries, found ${searchIndexEntryCount}`);
+      }
+
+      const seenUrls = new Set();
+      for (const [i, entry] of searchIndex.entries()) {
+        const label = `search-index.json[${i}]`;
+        if (!entry || typeof entry !== 'object') {
+          failures.push(`${label}: entry should be an object`);
+          continue;
+        }
+
+        for (const field of ['title', 'date', 'url', 'excerpt', 'text']) {
+          if (typeof entry[field] !== 'string' || !entry[field].trim()) {
+            failures.push(`${label}: ${field} should be a non-empty string`);
+          }
+        }
+
+        if (typeof entry.url === 'string') {
+          if (seenUrls.has(entry.url)) failures.push(`${label}: duplicate search result URL: ${entry.url}`);
+          seenUrls.add(entry.url);
+
+          const target = localTargetForUrl(entry.url);
+          if (!target) {
+            failures.push(`${label}: search result URL should be same-origin: ${entry.url}`);
+          } else if (path.extname(target.targetPath) !== '.html' || !target.targetPath.startsWith(postsDir + path.sep)) {
+            failures.push(`${label}: search result URL should point at a post page: ${entry.url}`);
+          } else if (!existsSync(target.targetPath)) {
+            failures.push(`${label}: search result URL target missing: ${entry.url}`);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    failures.push(`search-index.json is invalid JSON: ${error.message}`);
+  }
+}
+
 const manifest = loadYaml(await readFile(path.join(rootDir, 'gallery', 'photos.yaml'), 'utf8'));
 const expectedPhotos = Array.isArray(manifest?.photos) ? manifest.photos.length : 0;
 const galleryHtml = await readFile(path.join(distDir, 'gallery', 'index.html'), 'utf8');
@@ -576,5 +627,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${skipMainCount} skip/main landmarks, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${skipMainCount} skip/main landmarks, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
