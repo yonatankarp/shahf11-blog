@@ -10,6 +10,7 @@ const galleryDir = path.join(rootDir, 'gallery');
 const photosDir = path.join(galleryDir, 'photos');
 const manifestPath = path.join(galleryDir, 'photos.yaml');
 const imagePattern = /\.(?:jpe?g|png|webp|gif|heic)$/i;
+const portableFilenamePattern = /^[a-z0-9][a-z0-9._-]*\.(?:jpe?g|png|webp|gif|heic)$/;
 
 const doc = loadYaml(await readFile(manifestPath, 'utf8'));
 const photos = Array.isArray(doc?.photos) ? doc.photos : [];
@@ -25,6 +26,10 @@ for (const [index, file] of manifestFiles.entries()) {
 
   if (file.includes('/') || file.includes('\\')) {
     failures.push(`manifest file must be a filename only: ${file}`);
+  }
+
+  if (!portableFilenamePattern.test(file)) {
+    failures.push(`manifest file should use a portable lowercase ASCII filename: ${file}`);
   }
 
   if (!existsSync(path.join(photosDir, file))) {
