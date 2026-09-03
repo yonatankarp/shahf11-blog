@@ -8,8 +8,8 @@
 //      rewriteImageBase + withBase produce; a miss ships broken images
 //   4. each referenced image file actually exists in dist/
 //   5. every local archive image has alternative text
-//   6. every <a> pointing at posts-pdf/ or book/ is base-prefixed and the PDF
-//      file actually exists in dist/
+//   6. every <a> pointing at posts-pdf/ or book/ is base-prefixed, declares its
+//      PDF media type, and the PDF file actually exists in dist/
 //   7. every internal archive link resolves to a built page/file, and same-page
 //      plus cross-page fragments point at an existing id/name.
 //   8. post pages were generated
@@ -478,13 +478,17 @@ for (const file of files) {
     }
   }
 
-  for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+\.pdf)["']/gi)) {
+  for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+\.pdf)["'][^>]*>/gi)) {
+    const tag = m[0];
     const href = m[1];
     if (!href.includes('/posts-pdf/') && !href.includes('/book/')) continue;
     pdfCount += 1;
     if (!href.startsWith(`${BASE}/`)) {
       failures.push(`${rel}: pdf link not base-prefixed: ${href}`);
       continue;
+    }
+    if (attrValue(tag, 'type') !== 'application/pdf') {
+      failures.push(`${rel}: pdf link should declare type="application/pdf": ${href}`);
     }
     if (!existsSync(path.join(distDir, href.slice(BASE.length + 1)))) {
       failures.push(`${rel}: pdf file missing in dist: ${href}`);
