@@ -2,7 +2,7 @@
 // Dist-side check on the built site. Guards the regressions a passing build
 // won't catch on its own:
 //   1. every page keeps <html lang="he" dir="rtl"> (RTL is core to this blog)
-//   2. every page has a non-empty <title>
+//   2. every page has a non-empty <title> and meta description
 //   3. every local <img> pointing at images/ or gallery/photos/ is base-prefixed
 //      via both src and deferred data-src attributes — this is what
 //      rewriteImageBase + withBase produce; a miss ships broken images
@@ -82,6 +82,7 @@ let postCardTimeCount = 0;
 let postJsonLdHeadlineCount = 0;
 let skipMainCount = 0;
 let searchIndexEntryCount = 0;
+let descriptionCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -295,6 +296,11 @@ for (const file of files) {
   const title = html.match(/<title>([\s\S]*?)<\/title>/i);
   if (!title || !title[1].trim()) failures.push(`${rel}: empty or missing <title>`);
   const hasDescription = metas.has('description');
+  if (!hasDescription) {
+    failures.push(`${rel}: empty or missing meta description`);
+  } else {
+    descriptionCount += 1;
+  }
 
   if (canonicalLinks.length !== 1) {
     failures.push(`${rel}: expected exactly one canonical link, found ${canonicalLinks.length}`);
@@ -381,7 +387,7 @@ for (const file of files) {
     'name',
     'image',
   ]);
-  if (hasDescription) requireMeta(metas, rel, ['og:description', 'twitter:description', 'description']);
+  requireMeta(metas, rel, ['og:description', 'twitter:description', 'description']);
   if (metas.get('twitter:card')?.[0] !== 'summary_large_image') {
     failures.push(`${rel}: twitter:card should be summary_large_image`);
   }
@@ -631,5 +637,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${skipMainCount} skip/main landmarks, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${skipMainCount} skip/main landmarks, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
