@@ -78,6 +78,7 @@ const searchKey = (t: (typeof tags)[number]) =>
     const indexUrl = results.getAttribute('data-index');
     let index = null;
     let indexLoadFailed = false;
+    let searchRunId = 0;
 
     const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -105,6 +106,7 @@ const searchKey = (t: (typeof tags)[number]) =>
     }
 
     async function run() {
+      const runId = ++searchRunId;
       const rawQuery = input.value.trim();
       const q = normalizeSearchText(rawQuery);
       // filter the tag lists (people + topics) as before
@@ -115,20 +117,26 @@ const searchKey = (t: (typeof tags)[number]) =>
       if (!q) {
         results.hidden = true;
         hitsEl.innerHTML = '';
+        results.removeAttribute('aria-busy');
         input.setAttribute('aria-expanded', 'false');
         return;
       }
+      results.hidden = false;
+      results.setAttribute('aria-busy', 'true');
+      countEl.textContent = 'טוען את אינדקס החיפוש…';
+      hitsEl.innerHTML = '';
+      input.setAttribute('aria-expanded', 'true');
       const idx = await ensureIndex();
+      if (runId !== searchRunId) return;
+      if (normalizeSearchText(input.value.trim()) !== q) return;
+      results.removeAttribute('aria-busy');
       if (indexLoadFailed) {
-        results.hidden = false;
         countEl.textContent = 'החיפוש אינו זמין כרגע. נסו לרענן את העמוד.';
         hitsEl.innerHTML = '';
-        input.setAttribute('aria-expanded', 'true');
         return;
       }
       const matches = idx.filter((p) => p.text.includes(q));
       const shown = matches.slice(0, 50);
-      results.hidden = false;
       countEl.textContent = matches.length
         ? `${matches.length} רשומות שמזכירות ״${rawQuery}״`
         : `לא נמצאו רשומות עבור ״${rawQuery}״`;
@@ -137,7 +145,6 @@ const searchKey = (t: (typeof tags)[number]) =>
         `<span class="search-hit__date">${esc(p.date)}</span>` +
         `<p class="search-hit__ex">${esc(p.excerpt)}</p></li>`).join('') +
         (matches.length > shown.length ? `<li class="search-hit__more">מוצגות ${shown.length} מתוך ${matches.length}. צמצמו את החיפוש.</li>` : '');
-      input.setAttribute('aria-expanded', 'true');
     }
 
     let debounceTimer;

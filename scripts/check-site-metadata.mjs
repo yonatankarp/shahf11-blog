@@ -40,6 +40,7 @@
 //  27. post JSON-LD headlines match the visible post title.
 //  28. the client-side search index has one entry per post and every entry links
 //      to a built post page.
+//  29. the search page announces search-index loading before results arrive.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -349,6 +350,9 @@ for (const file of files) {
 
   if (rel === path.join('tags', 'index.html') && !html.includes('החיפוש אינו זמין כרגע')) {
     failures.push(`${rel}: missing explicit search-index failure status`);
+  }
+  if (rel === path.join('tags', 'index.html') && !html.includes('טוען את אינדקס החיפוש')) {
+    failures.push(`${rel}: missing explicit search-index loading status`);
   }
 
   for (const tag of sequenceLinks) {
