@@ -8,6 +8,7 @@ import { heroPhotoFile } from '../lib/hero';
 const posts = await getAllPosts(); // oldest-first
 const oldest = posts[0];
 const total = posts.length;
+const homeDescription = "ארכיון הבלוג 'חיה בסרט(ן)' מאת חיה, 2008–2009. מסע התמודדות עם סרטן השד, בהומור ובאומץ.";
 
 // The home feed renders every post (oldest-first); a client script reveals a random handful
 // each visit. Visitors without JS get the full archive list as a graceful fallback.
@@ -19,6 +20,7 @@ const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'Blog',
   name: 'חיה בסרט(ן)',
+  description: homeDescription,
   url: new URL(withBase(''), Astro.site).href,
   inLanguage: 'he',
   author: { '@type': 'Person', name: 'חיה קרפ-צור' },
@@ -26,7 +28,7 @@ const jsonLd = JSON.stringify({
 ---
 <Base
   title="חיה בסרט(ן) — בלוג הזיכרון של חיה"
-  description="ארכיון הבלוג 'חיה בסרט(ן)' מאת חיה, 2008–2009. מסע התמודדות עם סרטן השד, בהומור ובאומץ."
+  description={homeDescription}
   ogImage={heroPhoto ?? undefined}
 >
   <script type="application/ld+json" set:html={jsonLd} is:inline slot="head" />

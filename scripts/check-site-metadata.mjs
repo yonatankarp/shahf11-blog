@@ -41,6 +41,7 @@
 //  28. the client-side search index has one entry per post and every entry links
 //      to a built post page.
 //  29. the search page announces search-index loading before results arrive.
+//  30. the home Blog JSON-LD description matches the page meta description.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -83,6 +84,7 @@ let postCardTimeCount = 0;
 let postJsonLdHeadlineCount = 0;
 let skipMainCount = 0;
 let searchIndexEntryCount = 0;
+let blogJsonLdDescriptionCount = 0;
 let descriptionCount = 0;
 const pageTargets = new Map();
 
@@ -395,6 +397,16 @@ for (const file of files) {
   if (metas.get('twitter:card')?.[0] !== 'summary_large_image') {
     failures.push(`${rel}: twitter:card should be summary_large_image`);
   }
+  if (rel === 'index.html') {
+    const blogData = jsonLdObjects(html, rel).find((data) => data?.['@type'] === 'Blog');
+    if (!blogData) {
+      failures.push(`${rel}: missing Blog JSON-LD`);
+    } else if (blogData.description !== decodeHtmlAttr(metas.get('description')?.[0] ?? '')) {
+      failures.push(`${rel}: Blog JSON-LD description does not match meta description`);
+    } else {
+      blogJsonLdDescriptionCount += 1;
+    }
+  }
   // Every value matters, not just the first: a crawler may pick any repeated tag.
   const ogImages = metas.get('og:image') ?? [];
   const twitterImages = metas.get('twitter:image') ?? [];
@@ -641,5 +653,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${skipMainCount} skip/main landmarks, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${blogJsonLdDescriptionCount} Blog JSON-LD descriptions, ${skipMainCount} skip/main landmarks, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
