@@ -42,6 +42,7 @@
 //      to a built post page.
 //  29. the search page announces search-index loading before results arrive.
 //  30. the home Blog JSON-LD description matches the page meta description.
+//  31. post JSON-LD mainEntityOfPage points at the page canonical URL.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -82,6 +83,7 @@ let iconLinkCount = 0;
 let socialImageDimensionCount = 0;
 let postCardTimeCount = 0;
 let postJsonLdHeadlineCount = 0;
+let postJsonLdMainEntityCount = 0;
 let skipMainCount = 0;
 let searchIndexEntryCount = 0;
 let blogJsonLdDescriptionCount = 0;
@@ -462,6 +464,14 @@ for (const file of files) {
       } else if (blogPosting.datePublished !== articlePublishedTime) {
         failures.push(`${rel}: BlogPosting JSON-LD datePublished does not match article:published_time`);
       }
+      const mainEntityId = typeof blogPosting.mainEntityOfPage === 'string'
+        ? blogPosting.mainEntityOfPage
+        : blogPosting.mainEntityOfPage?.['@id'];
+      if (canonicalHref && mainEntityId !== canonicalHref) {
+        failures.push(`${rel}: BlogPosting JSON-LD mainEntityOfPage does not match canonical URL`);
+      } else if (canonicalHref) {
+        postJsonLdMainEntityCount += 1;
+      }
     }
   }
 
@@ -575,6 +585,9 @@ if (postCardTimeCount < 1) failures.push('no archive post-card publish times fou
 if (postJsonLdHeadlineCount !== postCount) {
   failures.push(`expected ${postCount} post JSON-LD headline checks, found ${postJsonLdHeadlineCount}`);
 }
+if (postJsonLdMainEntityCount !== postCount) {
+  failures.push(`expected ${postCount} post JSON-LD mainEntityOfPage checks, found ${postJsonLdMainEntityCount}`);
+}
 
 const searchIndexPath = path.join(distDir, 'search-index.json');
 if (!existsSync(searchIndexPath)) {
@@ -653,5 +666,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${blogJsonLdDescriptionCount} Blog JSON-LD descriptions, ${skipMainCount} skip/main landmarks, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${postJsonLdMainEntityCount} post JSON-LD mainEntityOfPage refs, ${blogJsonLdDescriptionCount} Blog JSON-LD descriptions, ${skipMainCount} skip/main landmarks, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
