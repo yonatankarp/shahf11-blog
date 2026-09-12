@@ -86,6 +86,7 @@ const searchKey = (t: (typeof tags)[number]) =>
       .normalize('NFKC')
       .toLowerCase()
       .replace(/[\u0591-\u05bd\u05bf-\u05c7]/g, '')
+      .replace(/[ךםןףץ]/g, (finalLetter) => ({ ך: 'כ', ם: 'מ', ן: 'נ', ף: 'פ', ץ: 'צ' }[finalLetter] || finalLetter))
       .replace(/["'״׳]/g, '')
       .replace(/[-־–—]/g, ' ')
       .replace(/[^\p{Letter}\p{Number}]+/gu, ' ')

@@ -6,10 +6,12 @@ import { withBase } from '../lib/url';
 // Prebuilt client-side search index: one entry per post. `text` is the lowercased haystack
 // (title + body + tag labels/aliases) so the on-page search matches any word in the blog,
 // not just tag names. Served static at <base>/search-index.json.
+const FINAL_HEBREW_LETTERS: Record<string, string> = { ך: 'כ', ם: 'מ', ן: 'נ', ף: 'פ', ץ: 'צ' };
 const normalizeSearchText = (value: string) => value
   .normalize('NFKC')
   .toLowerCase()
   .replace(/[\u0591-\u05bd\u05bf-\u05c7]/g, '')
+  .replace(/[ךםןףץ]/g, (finalLetter) => FINAL_HEBREW_LETTERS[finalLetter] ?? finalLetter)
   .replace(/["'״׳]/g, '')
   .replace(/[-־–—]/g, ' ')
   .replace(/[^\p{Letter}\p{Number}]+/gu, ' ')
