@@ -91,6 +91,8 @@ const searchKey = (t: (typeof tags)[number]) =>
       .replace(/[-־–—]/g, ' ')
       .replace(/[^\p{Letter}\p{Number}]+/gu, ' ')
       .trim();
+    const queryTerms = (value) => normalizeSearchText(value).split(/\s+/).filter(Boolean);
+    const matchesTerms = (haystack, terms) => terms.every((term) => haystack.includes(term));
 
     async function ensureIndex() {
       if (index) return index;
@@ -109,13 +111,13 @@ const searchKey = (t: (typeof tags)[number]) =>
     async function run() {
       const runId = ++searchRunId;
       const rawQuery = input.value.trim();
-      const q = normalizeSearchText(rawQuery);
+      const terms = queryTerms(rawQuery);
       // filter the tag lists (people + topics) as before
       for (const el of tagItems) {
         const hay = normalizeSearchText(el.getAttribute('data-search') || '');
-        el.style.display = !q || hay.includes(q) ? '' : 'none';
+        el.style.display = terms.length === 0 || matchesTerms(hay, terms) ? '' : 'none';
       }
-      if (!q) {
+      if (terms.length === 0) {
         results.hidden = true;
         hitsEl.innerHTML = '';
         results.removeAttribute('aria-busy');
@@ -129,14 +131,14 @@ const searchKey = (t: (typeof tags)[number]) =>
       input.setAttribute('aria-expanded', 'true');
       const idx = await ensureIndex();
       if (runId !== searchRunId) return;
-      if (normalizeSearchText(input.value.trim()) !== q) return;
+      if (queryTerms(input.value.trim()).join(' ') !== terms.join(' ')) return;
       results.removeAttribute('aria-busy');
       if (indexLoadFailed) {
         countEl.textContent = 'החיפוש אינו זמין כרגע. נסו לרענן את העמוד.';
         hitsEl.innerHTML = '';
         return;
       }
-      const matches = idx.filter((p) => p.text.includes(q));
+      const matches = idx.filter((p) => matchesTerms(p.text, terms));
       const shown = matches.slice(0, 50);
       countEl.textContent = matches.length
         ? `${matches.length} רשומות שמזכירות ״${rawQuery}״`
