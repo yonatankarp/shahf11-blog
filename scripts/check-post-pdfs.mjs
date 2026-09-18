@@ -18,6 +18,8 @@ const postFiles = (await readdir(contentDir)).filter((f) => f.endsWith('.md')).s
 const pdfFiles = (await readdir(pdfDir)).filter((f) => f.endsWith('.pdf')).sort();
 const postPdfNames = new Set(postFiles.map((f) => f.replace(/\.md$/, '.pdf')));
 const failures = [];
+const seenEntryIds = new Map();
+const seenSourceUrls = new Map();
 let sourceUrlCount = 0;
 
 for (const file of postFiles) {
@@ -36,12 +38,26 @@ for (const file of postFiles) {
   if (!file.includes(`EID${data.entryId}`)) {
     failures.push(`${file}: filename does not include frontmatter entryId ${data.entryId}`);
   }
+  if (seenEntryIds.has(data.entryId)) {
+    failures.push(`${file}: duplicate entryId ${data.entryId} also used by ${seenEntryIds.get(data.entryId)}`);
+  } else {
+    seenEntryIds.set(data.entryId, file);
+  }
   if (!data.source_url) {
     failures.push(`${file}: missing source_url provenance`);
   } else {
     try {
       const sourceUrl = new URL(data.source_url);
+      const normalizedSourceUrl = sourceUrl.href;
       sourceUrlCount += 1;
+      if (seenSourceUrls.has(normalizedSourceUrl)) {
+        failures.push(`${file}: duplicate source_url also used by ${seenSourceUrls.get(normalizedSourceUrl)}`);
+      } else {
+        seenSourceUrls.set(normalizedSourceUrl, file);
+      }
+      if (sourceUrl.hostname !== 'www.tapuz.co.il' || sourceUrl.pathname !== '/blog/print.asp') {
+        failures.push(`${file}: source_url should be the Tapuz print endpoint`);
+      }
       if (sourceUrl.searchParams.get('EntryId') !== data.entryId) {
         failures.push(`${file}: source_url EntryId does not match frontmatter entryId ${data.entryId}`);
       }
