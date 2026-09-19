@@ -24,6 +24,7 @@ const path = Astro.url.pathname.replace(/\/$/, '');
 // Canonical/og URLs must be absolute — WhatsApp/Facebook won't fetch root-relative ones.
 const canonicalPath = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
 const canonical = new URL(canonicalPath, Astro.site);
+const feedUrl = new URL(withBase('feed.xml'), Astro.site);
 // ogImage, when passed, must already be base-prefixed (e.g. withBase() output) — it's resolved against Astro.site here, not re-prefixed.
 // Default: the hero portrait (src/lib/hero.ts), so the og:image can never point at a deleted file.
 const ogImagePath = ogImage ?? (heroPhotoFile ? withBase(heroPhotoFile) : null);
@@ -65,6 +66,7 @@ const nav = [
     <meta name="theme-color" content="#f7efe3" />
     <link rel="canonical" href={canonical} />
     <link rel="sitemap" type="application/xml" href={withBase('sitemap-index.xml')} />
+    <link rel="alternate" type="application/rss+xml" title="חיה בסרט(ן)" href={feedUrl} />
     <link rel="preload" as="font" type="font/woff2" href={frankHebrewWoff2} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={assistantHebrewWoff2} crossorigin />
     <link rel="preload" as="font" type="font/woff2" href={gveretHebrewWoff2} crossorigin />

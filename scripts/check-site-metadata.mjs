@@ -43,6 +43,7 @@
 //  29. the search page announces search-index loading before results arrive.
 //  30. the home Blog JSON-LD description matches the page meta description.
 //  31. post JSON-LD mainEntityOfPage points at the page canonical URL.
+//  32. every page advertises the local RSS feed for archive subscriptions.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -88,6 +89,7 @@ let skipMainCount = 0;
 let searchIndexEntryCount = 0;
 let blogJsonLdDescriptionCount = 0;
 let descriptionCount = 0;
+let rssLinkCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -273,6 +275,7 @@ for (const file of files) {
   const canonicalLinks = linkTags(markup, 'canonical');
   const sitemapLinks = linkTags(markup, 'sitemap');
   const iconLinks = linkTags(markup, 'icon');
+  const rssLinks = linkTags(markup, 'alternate').filter((tag) => attrValue(tag, 'type').toLowerCase() === 'application/rss+xml');
   const sequenceLinks = [...linkTags(markup, 'prev'), ...linkTags(markup, 'next')];
   let canonicalHref = null;
 
@@ -350,6 +353,13 @@ for (const file of files) {
       iconLinkCount += 1;
       requireLocalAssetUrl(rel, 'favicon link', attrValue(tag, 'href'));
     }
+  }
+
+  if (rssLinks.length !== 1) {
+    failures.push(`${rel}: expected exactly one RSS alternate link, found ${rssLinks.length}`);
+  } else {
+    rssLinkCount += 1;
+    requireLocalBuiltFileUrl(rel, 'RSS alternate link', attrValue(rssLinks[0], 'href'));
   }
 
   if (rel === path.join('tags', 'index.html') && !html.includes('החיפוש אינו זמין כרגע')) {
@@ -659,6 +669,19 @@ if (!existsSync(robotsPath)) {
   }
 }
 
+const feedPath = path.join(distDir, 'feed.xml');
+if (!existsSync(feedPath)) {
+  failures.push('feed.xml missing from dist');
+} else {
+  const feed = await readFile(feedPath, 'utf8');
+  const rssItems = [...feed.matchAll(/<item>/g)].length;
+  if (!/<rss\b[^>]*version=["']2\.0["']/i.test(feed)) failures.push('feed.xml missing RSS 2.0 root');
+  if (!new RegExp(`<atom:link\\b[^>]*href=["']${SITE_ORIGIN}/feed\\.xml["'][^>]*rel=["']self["']`, 'i').test(feed)) {
+    failures.push('feed.xml missing canonical self link');
+  }
+  if (rssItems !== postCount) failures.push(`feed.xml expected ${postCount} items, found ${rssItems}`);
+}
+
 if (failures.length > 0) {
   console.error('Site metadata check failed:');
   for (const f of failures) console.error(`- ${f}`);
@@ -666,5 +689,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${postJsonLdMainEntityCount} post JSON-LD mainEntityOfPage refs, ${blogJsonLdDescriptionCount} Blog JSON-LD descriptions, ${skipMainCount} skip/main landmarks, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${rssLinkCount} RSS links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${postJsonLdMainEntityCount} post JSON-LD mainEntityOfPage refs, ${blogJsonLdDescriptionCount} Blog JSON-LD descriptions, ${skipMainCount} skip/main landmarks, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
