@@ -43,6 +43,7 @@
 //  29. the search page announces search-index loading before results arrive.
 //  30. the home Blog JSON-LD description matches the page meta description.
 //  31. post JSON-LD mainEntityOfPage points at the page canonical URL.
+//  32. exactly one primary navigation link is marked aria-current on every page.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -88,6 +89,7 @@ let skipMainCount = 0;
 let searchIndexEntryCount = 0;
 let blogJsonLdDescriptionCount = 0;
 let descriptionCount = 0;
+let currentNavCount = 0;
 const pageTargets = new Map();
 
 function anchorTargets(html) {
@@ -279,6 +281,18 @@ for (const file of files) {
   const htmlTag = html.match(/<html\b[^>]*>/i)?.[0] ?? '';
   if (!/\blang=["']he["']/i.test(htmlTag) || !/\bdir=["']rtl["']/i.test(htmlTag)) {
     failures.push(`${rel}: <html> missing lang="he" dir="rtl"`);
+  }
+
+  const primaryNav = markup.match(/<nav\b[^>]*\baria-label=["']ניווט ראשי["'][^>]*>([\s\S]*?)<\/nav>/i);
+  if (!primaryNav) {
+    failures.push(`${rel}: missing primary navigation landmark`);
+  } else {
+    const currentLinks = [...primaryNav[1].matchAll(/<a\b[^>]*\baria-current=["']page["'][^>]*>/gi)];
+    if (currentLinks.length !== 1) {
+      failures.push(`${rel}: expected exactly one primary nav aria-current="page" link, found ${currentLinks.length}`);
+    } else {
+      currentNavCount += 1;
+    }
   }
 
   const skipLinks = [...markup.matchAll(/<a\b[^>]*>/gi)].filter((m) => {
@@ -666,5 +680,5 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${postJsonLdMainEntityCount} post JSON-LD mainEntityOfPage refs, ${blogJsonLdDescriptionCount} Blog JSON-LD descriptions, ${skipMainCount} skip/main landmarks, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${postJsonLdMainEntityCount} post JSON-LD mainEntityOfPage refs, ${blogJsonLdDescriptionCount} Blog JSON-LD descriptions, ${skipMainCount} skip/main landmarks, ${currentNavCount} current nav markers, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
 );
