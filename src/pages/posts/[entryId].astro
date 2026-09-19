@@ -24,6 +24,7 @@ const topic = (post.data.tags ?? []).map(getTag).find((t) => t.kind === 'topic')
 const description = excerpt(post.body ?? '');
 const socialTags = (post.data.tags ?? []).map((tag) => getTag(tag).label);
 const dateTime = publishedDateTime(post);
+const canonicalUrl = new URL(`${Astro.url.pathname.replace(/\/$/, '')}/`, Astro.site).href;
 const imageDimensionsPath = path.join(process.cwd(), 'public', 'images-dimensions.json');
 let imageDimensions = {};
 try {
@@ -40,7 +41,8 @@ const jsonLd = JSON.stringify({
   datePublished: dateTime,
   inLanguage: 'he',
   author: { '@type': 'Person', name: 'חיה קרפ-צור' },
-  url: new URL(`${Astro.url.pathname.replace(/\/$/, '')}/`, Astro.site).href,
+  url: canonicalUrl,
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
 }).replace(/</g, '\\u003c');
 ---
 <Base

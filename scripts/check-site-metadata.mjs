@@ -2,14 +2,14 @@
 // Dist-side check on the built site. Guards the regressions a passing build
 // won't catch on its own:
 //   1. every page keeps <html lang="he" dir="rtl"> (RTL is core to this blog)
-//   2. every page has a non-empty <title>
+//   2. every page has a non-empty <title> and meta description
 //   3. every local <img> pointing at images/ or gallery/photos/ is base-prefixed
 //      via both src and deferred data-src attributes — this is what
 //      rewriteImageBase + withBase produce; a miss ships broken images
 //   4. each referenced image file actually exists in dist/
 //   5. every local archive image has alternative text
-//   6. every <a> pointing at posts-pdf/ or book/ is base-prefixed and the PDF
-//      file actually exists in dist/
+//   6. every <a> pointing at posts-pdf/ or book/ is base-prefixed, declares its
+//      PDF media type, and the PDF file actually exists in dist/
 //   7. every internal archive link resolves to a built page/file, and same-page
 //      plus cross-page fragments point at an existing id/name.
 //   8. post pages were generated
@@ -32,12 +32,19 @@
 //  21. the sitemap discovery link declares its XML media type.
 //  22. post JSON-LD URLs match the page canonical URL.
 //  23. robots.txt advertises the built sitemap with the canonical site origin.
-//  24. every page keeps a skip-to-content link pointing at a focusable main
-//      landmark.
+//  24. every page keeps exactly one skip-to-content link pointing at exactly
+//      one focusable main landmark.
 //  25. post publish times keep the visible Hebrew time in machine-readable metadata.
 //  26. archive cards keep the visible Hebrew publish time in machine-readable
 //      <time> metadata too.
-//  27. the generated sitemap is same-origin and lists exactly the built page
+//  27. post JSON-LD headlines match the visible post title.
+//  28. the client-side search index has one entry per post and every entry links
+//      to a built post page.
+//  29. the search page announces search-index loading before results arrive.
+//  30. the home Blog JSON-LD description matches the page meta description.
+//  31. post JSON-LD mainEntityOfPage points at the page canonical URL.
+//  32. exactly one primary navigation link is marked aria-current on every page.
+//  33. the generated sitemap is same-origin and lists exactly the built page
 //      canonical URLs.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
@@ -78,6 +85,13 @@ let videoAssetCount = 0;
 let iconLinkCount = 0;
 let socialImageDimensionCount = 0;
 let postCardTimeCount = 0;
+let postJsonLdHeadlineCount = 0;
+let postJsonLdMainEntityCount = 0;
+let skipMainCount = 0;
+let searchIndexEntryCount = 0;
+let blogJsonLdDescriptionCount = 0;
+let descriptionCount = 0;
+let currentNavCount = 0;
 const pageTargets = new Map();
 const canonicalUrls = new Set();
 
@@ -104,6 +118,10 @@ function decodeHtmlAttr(value) {
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&');
+}
+
+function decodeHtmlText(value) {
+  return decodeHtmlAttr(value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim());
 }
 
 function metaTags(markup) {
@@ -268,23 +286,43 @@ for (const file of files) {
     failures.push(`${rel}: <html> missing lang="he" dir="rtl"`);
   }
 
-  const hasSkipLink = [...markup.matchAll(/<a\b[^>]*>/gi)].some((m) => {
+  const primaryNav = markup.match(/<nav\b[^>]*\baria-label=["']ניווט ראשי["'][^>]*>([\s\S]*?)<\/nav>/i);
+  if (!primaryNav) {
+    failures.push(`${rel}: missing primary navigation landmark`);
+  } else {
+    const currentLinks = [...primaryNav[1].matchAll(/<a\b[^>]*\baria-current=["']page["'][^>]*>/gi)];
+    if (currentLinks.length !== 1) {
+      failures.push(`${rel}: expected exactly one primary nav aria-current="page" link, found ${currentLinks.length}`);
+    } else {
+      currentNavCount += 1;
+    }
+  }
+
+  const skipLinks = [...markup.matchAll(/<a\b[^>]*>/gi)].filter((m) => {
     const tag = m[0];
     return attrValue(tag, 'class').split(/\s+/).includes('skip-link') && attrValue(tag, 'href') === '#main';
   });
-  const hasFocusableMain = [...markup.matchAll(/<main\b[^>]*>/gi)].some((m) => (
+  const focusableMains = [...markup.matchAll(/<main\b[^>]*>/gi)].filter((m) => (
     attrValue(m[0], 'id') === 'main' && attrValue(m[0], 'tabindex') === '-1'
   ));
-  if (!hasSkipLink) {
-    failures.push(`${rel}: missing skip-to-content link to #main`);
+  if (skipLinks.length !== 1) {
+    failures.push(`${rel}: expected exactly one skip-to-content link to #main, found ${skipLinks.length}`);
   }
-  if (!hasFocusableMain) {
-    failures.push(`${rel}: missing focusable main landmark`);
+  if (focusableMains.length !== 1) {
+    failures.push(`${rel}: expected exactly one focusable main landmark, found ${focusableMains.length}`);
+  }
+  if (skipLinks.length === 1 && focusableMains.length === 1) {
+    skipMainCount += 1;
   }
 
   const title = html.match(/<title>([\s\S]*?)<\/title>/i);
   if (!title || !title[1].trim()) failures.push(`${rel}: empty or missing <title>`);
   const hasDescription = metas.has('description');
+  if (!hasDescription) {
+    failures.push(`${rel}: empty or missing meta description`);
+  } else {
+    descriptionCount += 1;
+  }
 
   if (canonicalLinks.length !== 1) {
     failures.push(`${rel}: expected exactly one canonical link, found ${canonicalLinks.length}`);
@@ -335,6 +373,9 @@ for (const file of files) {
   if (rel === path.join('tags', 'index.html') && !html.includes('החיפוש אינו זמין כרגע')) {
     failures.push(`${rel}: missing explicit search-index failure status`);
   }
+  if (rel === path.join('tags', 'index.html') && !html.includes('טוען את אינדקס החיפוש')) {
+    failures.push(`${rel}: missing explicit search-index loading status`);
+  }
 
   for (const tag of sequenceLinks) {
     const href = attrValue(tag, 'href');
@@ -372,9 +413,19 @@ for (const file of files) {
     'name',
     'image',
   ]);
-  if (hasDescription) requireMeta(metas, rel, ['og:description', 'twitter:description', 'description']);
+  requireMeta(metas, rel, ['og:description', 'twitter:description', 'description']);
   if (metas.get('twitter:card')?.[0] !== 'summary_large_image') {
     failures.push(`${rel}: twitter:card should be summary_large_image`);
+  }
+  if (rel === 'index.html') {
+    const blogData = jsonLdObjects(html, rel).find((data) => data?.['@type'] === 'Blog');
+    if (!blogData) {
+      failures.push(`${rel}: missing Blog JSON-LD`);
+    } else if (blogData.description !== decodeHtmlAttr(metas.get('description')?.[0] ?? '')) {
+      failures.push(`${rel}: Blog JSON-LD description does not match meta description`);
+    } else {
+      blogJsonLdDescriptionCount += 1;
+    }
   }
   // Every value matters, not just the first: a crawler may pick any repeated tag.
   const ogImages = metas.get('og:image') ?? [];
@@ -413,12 +464,32 @@ for (const file of files) {
     const blogPosting = jsonLdObjects(html, rel).find((data) => data?.['@type'] === 'BlogPosting');
     if (!blogPosting) {
       failures.push(`${rel}: missing BlogPosting JSON-LD`);
-    } else if (blogPosting.description !== decodeHtmlAttr(metas.get('description')?.[0] ?? '')) {
-      failures.push(`${rel}: BlogPosting JSON-LD description does not match meta description`);
-    } else if (canonicalHref && blogPosting.url !== canonicalHref) {
-      failures.push(`${rel}: BlogPosting JSON-LD URL does not match canonical URL`);
-    } else if (blogPosting.datePublished !== articlePublishedTime) {
-      failures.push(`${rel}: BlogPosting JSON-LD datePublished does not match article:published_time`);
+    } else {
+      const visiblePostTitle = markup.match(/<h1\b[^>]*class=["'][^"']*\bpost__title\b[^"']*["'][^>]*>([\s\S]*?)<\/h1>/i);
+      if (!visiblePostTitle) {
+        failures.push(`${rel}: missing visible post title`);
+      } else {
+        postJsonLdHeadlineCount += 1;
+        const headline = decodeHtmlText(visiblePostTitle[1]);
+        if (blogPosting.headline !== headline) {
+          failures.push(`${rel}: BlogPosting JSON-LD headline does not match visible post title`);
+        }
+      }
+      if (blogPosting.description !== decodeHtmlAttr(metas.get('description')?.[0] ?? '')) {
+        failures.push(`${rel}: BlogPosting JSON-LD description does not match meta description`);
+      } else if (canonicalHref && blogPosting.url !== canonicalHref) {
+        failures.push(`${rel}: BlogPosting JSON-LD URL does not match canonical URL`);
+      } else if (blogPosting.datePublished !== articlePublishedTime) {
+        failures.push(`${rel}: BlogPosting JSON-LD datePublished does not match article:published_time`);
+      }
+      const mainEntityId = typeof blogPosting.mainEntityOfPage === 'string'
+        ? blogPosting.mainEntityOfPage
+        : blogPosting.mainEntityOfPage?.['@id'];
+      if (canonicalHref && mainEntityId !== canonicalHref) {
+        failures.push(`${rel}: BlogPosting JSON-LD mainEntityOfPage does not match canonical URL`);
+      } else if (canonicalHref) {
+        postJsonLdMainEntityCount += 1;
+      }
     }
   }
 
@@ -457,13 +528,17 @@ for (const file of files) {
     }
   }
 
-  for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+\.pdf)["']/gi)) {
+  for (const m of markup.matchAll(/<a\b[^>]*\bhref=["']([^"']+\.pdf)["'][^>]*>/gi)) {
+    const tag = m[0];
     const href = m[1];
     if (!href.includes('/posts-pdf/') && !href.includes('/book/')) continue;
     pdfCount += 1;
     if (!href.startsWith(`${BASE}/`)) {
       failures.push(`${rel}: pdf link not base-prefixed: ${href}`);
       continue;
+    }
+    if (attrValue(tag, 'type') !== 'application/pdf') {
+      failures.push(`${rel}: pdf link should declare type="application/pdf": ${href}`);
     }
     if (!existsSync(path.join(distDir, href.slice(BASE.length + 1)))) {
       failures.push(`${rel}: pdf file missing in dist: ${href}`);
@@ -525,6 +600,60 @@ const postCount = existsSync(postsDir)
   : 0;
 if (postCount < 1) failures.push('no post pages generated under dist/posts/');
 if (postCardTimeCount < 1) failures.push('no archive post-card publish times found');
+if (postJsonLdHeadlineCount !== postCount) {
+  failures.push(`expected ${postCount} post JSON-LD headline checks, found ${postJsonLdHeadlineCount}`);
+}
+if (postJsonLdMainEntityCount !== postCount) {
+  failures.push(`expected ${postCount} post JSON-LD mainEntityOfPage checks, found ${postJsonLdMainEntityCount}`);
+}
+
+const searchIndexPath = path.join(distDir, 'search-index.json');
+if (!existsSync(searchIndexPath)) {
+  failures.push('search-index.json missing from dist');
+} else {
+  try {
+    const searchIndex = JSON.parse(await readFile(searchIndexPath, 'utf8'));
+    if (!Array.isArray(searchIndex)) {
+      failures.push('search-index.json should contain an array');
+    } else {
+      searchIndexEntryCount = searchIndex.length;
+      if (searchIndexEntryCount !== postCount) {
+        failures.push(`search-index.json expected ${postCount} entries, found ${searchIndexEntryCount}`);
+      }
+
+      const seenUrls = new Set();
+      for (const [i, entry] of searchIndex.entries()) {
+        const label = `search-index.json[${i}]`;
+        if (!entry || typeof entry !== 'object') {
+          failures.push(`${label}: entry should be an object`);
+          continue;
+        }
+
+        for (const field of ['title', 'date', 'url', 'excerpt', 'text']) {
+          if (typeof entry[field] !== 'string' || !entry[field].trim()) {
+            failures.push(`${label}: ${field} should be a non-empty string`);
+          }
+        }
+
+        if (typeof entry.url === 'string') {
+          if (seenUrls.has(entry.url)) failures.push(`${label}: duplicate search result URL: ${entry.url}`);
+          seenUrls.add(entry.url);
+
+          const target = localTargetForUrl(entry.url);
+          if (!target) {
+            failures.push(`${label}: search result URL should be same-origin: ${entry.url}`);
+          } else if (path.extname(target.targetPath) !== '.html' || !target.targetPath.startsWith(postsDir + path.sep)) {
+            failures.push(`${label}: search result URL should point at a post page: ${entry.url}`);
+          } else if (!existsSync(target.targetPath)) {
+            failures.push(`${label}: search result URL target missing: ${entry.url}`);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    failures.push(`search-index.json is invalid JSON: ${error.message}`);
+  }
+}
 
 const manifest = loadYaml(await readFile(path.join(rootDir, 'gallery', 'photos.yaml'), 'utf8'));
 const expectedPhotos = Array.isArray(manifest?.photos) ? manifest.photos.length : 0;
@@ -595,6 +724,6 @@ if (failures.length > 0) {
 }
 
 console.log(
-  `Metadata OK: ${files.length} pages, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${postJsonLdMainEntityCount} post JSON-LD mainEntityOfPage refs, ${blogJsonLdDescriptionCount} Blog JSON-LD descriptions, ${skipMainCount} skip/main landmarks, ${currentNavCount} current nav markers, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
   `Sitemap OK: ${sitemapFileCount} sitemap file(s), ${sitemapPageUrls.size} canonical page URLs.`,
 );
