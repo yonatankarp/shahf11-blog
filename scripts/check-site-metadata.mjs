@@ -44,6 +44,8 @@
 //  30. the home Blog JSON-LD description matches the page meta description.
 //  31. post JSON-LD mainEntityOfPage points at the page canonical URL.
 //  32. exactly one primary navigation link is marked aria-current on every page.
+//  33. the generated sitemap is same-origin and lists exactly the built page
+//      canonical URLs.
 import { readdir, readFile } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -91,6 +93,7 @@ let blogJsonLdDescriptionCount = 0;
 let descriptionCount = 0;
 let currentNavCount = 0;
 const pageTargets = new Map();
+const canonicalUrls = new Set();
 
 function anchorTargets(html) {
   const targets = new Set();
@@ -342,6 +345,7 @@ for (const file of files) {
       if (metas.get('og:url')?.[0] !== href) {
         failures.push(`${rel}: og:url does not match canonical URL`);
       }
+      canonicalUrls.add(href);
     }
   }
 
@@ -673,6 +677,46 @@ if (!existsSync(robotsPath)) {
   }
 }
 
+const sitemapIndexPath = path.join(distDir, 'sitemap-index.xml');
+const sitemapPageUrls = new Set();
+let sitemapFileCount = 0;
+if (!existsSync(sitemapIndexPath)) {
+  failures.push('sitemap-index.xml missing from dist');
+} else {
+  const sitemapIndex = await readFile(sitemapIndexPath, 'utf8');
+  const sitemapUrls = [...sitemapIndex.matchAll(/<sitemap>\s*<loc>([^<]+)<\/loc>\s*<\/sitemap>/gi)]
+    .map((m) => decodeHtmlAttr(m[1].trim()));
+
+  if (sitemapUrls.length < 1) failures.push('sitemap-index.xml does not list any sitemap files');
+
+  for (const sitemapUrl of sitemapUrls) {
+    const target = localTargetForUrl(sitemapUrl);
+    if (!target || path.extname(target.targetPath) !== '.xml') {
+      failures.push(`sitemap-index.xml lists a non-local XML sitemap: ${sitemapUrl}`);
+      continue;
+    }
+    if (!existsSync(target.targetPath)) {
+      failures.push(`sitemap-index.xml lists a missing sitemap file: ${sitemapUrl}`);
+      continue;
+    }
+
+    sitemapFileCount += 1;
+    const sitemapXml = await readFile(target.targetPath, 'utf8');
+    for (const match of sitemapXml.matchAll(/<url>\s*<loc>([^<]+)<\/loc>\s*<\/url>/gi)) {
+      const loc = decodeHtmlAttr(match[1].trim());
+      if (!localTargetForUrl(loc)) failures.push(`${path.basename(target.targetPath)} lists a non-local URL: ${loc}`);
+      sitemapPageUrls.add(loc);
+    }
+  }
+}
+
+for (const canonicalUrl of canonicalUrls) {
+  if (!sitemapPageUrls.has(canonicalUrl)) failures.push(`sitemap missing canonical page URL: ${canonicalUrl}`);
+}
+for (const sitemapUrl of sitemapPageUrls) {
+  if (!canonicalUrls.has(sitemapUrl)) failures.push(`sitemap lists URL without a built canonical page: ${sitemapUrl}`);
+}
+
 if (failures.length > 0) {
   console.error('Site metadata check failed:');
   for (const f of failures) console.error(`- ${f}`);
@@ -681,4 +725,5 @@ if (failures.length > 0) {
 
 console.log(
   `Metadata OK: ${files.length} pages, ${descriptionCount} meta descriptions, ${postCount} posts, ${imgCount} image refs, ${pdfCount} pdf links, ${videoAssetCount} video assets, ${iconLinkCount} favicon links, ${socialImageDimensionCount} social image dimensions, ${postCardTimeCount} archive card times, ${postJsonLdHeadlineCount} post JSON-LD headlines, ${postJsonLdMainEntityCount} post JSON-LD mainEntityOfPage refs, ${blogJsonLdDescriptionCount} Blog JSON-LD descriptions, ${skipMainCount} skip/main landmarks, ${currentNavCount} current nav markers, ${searchIndexEntryCount} search index entries, ${internalLinkCount} internal links, and ${tapuzLinkCount} Tapuz outbound links verified.`,
+  `Sitemap OK: ${sitemapFileCount} sitemap file(s), ${sitemapPageUrls.size} canonical page URLs.`,
 );
