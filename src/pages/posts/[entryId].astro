@@ -70,14 +70,15 @@ const jsonLd = JSON.stringify({
     )}
     {extraImgs.length > 0 && (
       <section class="gallery gallery--lead">
-        {extraImgs.map((f) => (
+        {extraImgs.map((f, index) => (
           <img
             src={withBase(`images/${f}`)}
             alt={`תמונה מתוך "${post.data.title}"`}
             width={dimensionsFor(f).width}
             height={dimensionsFor(f).height}
-            loading="lazy"
+            loading={index === 0 ? 'eager' : 'lazy'}
             decoding="async"
+            fetchpriority={index === 0 ? 'high' : undefined}
           />
         ))}
       </section>
