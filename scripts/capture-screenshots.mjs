@@ -4,7 +4,7 @@
 // about) at desktop + mobile. Not a pixel-diff — the screenshots are uploaded as
 // a CI artifact for a quick human eyeball, and any route that fails to load 2xx
 // fails the job. Mirrors yonatankarp.github.io's visual:capture.
-import { existsSync, mkdirSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync } from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
@@ -34,7 +34,15 @@ const viewports = [
 const postDirs = existsSync(path.join(distDir, 'posts'))
   ? readdirSync(path.join(distDir, 'posts'), { withFileTypes: true }).filter((d) => d.isDirectory())
   : [];
-const samplePost = postDirs.find((d) => /\d/.test(d.name))?.name ?? postDirs[0]?.name;
+const hasArchiveImage = (postDir) => {
+  try {
+    const html = readFileSync(path.join(distDir, 'posts', postDir.name, 'index.html'), 'utf8');
+    return /<img\b[^>]+\bsrc=["']\/images\//i.test(html);
+  } catch {
+    return false;
+  }
+};
+const samplePost = postDirs.find(hasArchiveImage)?.name ?? postDirs.find((d) => /\d/.test(d.name))?.name ?? postDirs[0]?.name;
 
 const routes = [
   { name: 'home', path: `${BASE}/` },
