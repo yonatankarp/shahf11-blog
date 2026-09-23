@@ -33,6 +33,9 @@ try {
   imageDimensions = {};
 }
 const dimensionsFor = (file) => imageDimensions[file] ?? {};
+const socialImageFile = post.data.images[0] ?? null;
+const socialImageDimensions = socialImageFile ? dimensionsFor(socialImageFile) : {};
+const socialImage = socialImageFile ? withBase(`images/${socialImageFile}`) : undefined;
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
@@ -43,11 +46,16 @@ const jsonLd = JSON.stringify({
   author: { '@type': 'Person', name: 'חיה קרפ-צור' },
   url: canonicalUrl,
   mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalUrl },
+  ...(socialImage ? { image: new URL(socialImage, Astro.site).href } : {}),
 }).replace(/</g, '\\u003c');
 ---
 <Base
   title={`${post.data.title} — חיה בסרט(ן)`}
   description={description}
+  ogImage={socialImage}
+  ogImageAlt={socialImage ? `תמונה מתוך "${post.data.title}"` : undefined}
+  ogImageWidth={socialImageDimensions.width}
+  ogImageHeight={socialImageDimensions.height}
   ogType="article"
   articlePublishedTime={dateTime}
   articleTags={socialTags}
