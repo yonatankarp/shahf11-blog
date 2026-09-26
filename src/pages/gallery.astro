@@ -38,7 +38,14 @@ const dimensionsFor = (kind, file) => galleryDimensions[kind]?.[file] ?? {};
         <section class="gallery-carousel" aria-label="תמונות נבחרות" data-gallery-carousel>
           <div class="gallery-carousel__track">
             {photos.map((p, index) => (
-              <button class:list={['gallery-carousel__slide', { 'is-active': index === 0 }]} type="button" data-gallery-index={index} aria-label={`פתחו תמונה ${index + 1} מתוך ${photos.length} במסך מלא`}>
+              <button
+                class:list={['gallery-carousel__slide', { 'is-active': index === 0 }]}
+                type="button"
+                data-gallery-index={index}
+                aria-label={`פתחו תמונה ${index + 1} מתוך ${photos.length} במסך מלא`}
+                aria-hidden={index === 0 ? undefined : 'true'}
+                tabindex={index === 0 ? undefined : '-1'}
+              >
                 <img
                   src={index === 0 ? withBase(`gallery/photos/${p.file}`) : undefined}
                   data-src={index === 0 ? undefined : withBase(`gallery/photos/${p.file}`)}
@@ -115,7 +122,11 @@ const dimensionsFor = (kind, file) => galleryDimensions[kind]?.[file] ?? {};
             hydrate(current);
             hydrate(current + 1); // prefetch the next slide
             slides.forEach((slide, slideIndex) => {
-              slide.classList.toggle('is-active', slideIndex === current);
+              const isActive = slideIndex === current;
+              slide.classList.toggle('is-active', isActive);
+              slide.setAttribute('aria-hidden', String(!isActive));
+              if (isActive) slide.removeAttribute('tabindex');
+              else slide.setAttribute('tabindex', '-1');
             });
           };
 
