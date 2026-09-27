@@ -34,9 +34,10 @@
 //  23. robots.txt advertises the built sitemap with the canonical site origin.
 //  24. every page keeps exactly one skip-to-content link pointing at exactly
 //      one focusable main landmark.
-//  25. post publish times keep the visible Hebrew time in machine-readable metadata.
-//  26. archive cards keep the visible Hebrew publish time in machine-readable
-//      <time> metadata too.
+//  25. post publish times keep the visible Hebrew time in valid machine-readable
+//      metadata.
+//  26. archive cards keep the visible Hebrew publish time in valid
+//      machine-readable <time> metadata too.
 //  27. post JSON-LD headlines match the visible post title.
 //  28. the client-side search index has one entry per post and every entry links
 //      to a built post page.
@@ -452,8 +453,8 @@ for (const file of files) {
   if (metas.get('og:type')?.[0] === 'article') {
     requireMeta(metas, rel, ['article:published_time', 'article:author', 'article:tag']);
     const articlePublishedTime = metas.get('article:published_time')?.[0] ?? '';
-    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(articlePublishedTime)) {
-      failures.push(`${rel}: article:published_time should include the visible publish time: ${articlePublishedTime}`);
+    if (!/^\d{4}-\d{2}-\d{2}T(?:[01]\d|2[0-3]):[0-5]\d$/.test(articlePublishedTime)) {
+      failures.push(`${rel}: article:published_time should include a valid visible publish time: ${articlePublishedTime}`);
     }
     const visibleTimeTag = markup.match(/<time\b[^>]*class=["'][^"']*\beyebrow\b[^"']*["'][^>]*>/i)?.[0];
     if (!visibleTimeTag) {
@@ -519,10 +520,10 @@ for (const file of files) {
     postCardTimeCount += 1;
     const tag = m[0];
     const dateTime = attrValue(tag, 'datetime');
-    const machineTime = dateTime.match(/^\d{4}-\d{2}-\d{2}T(\d{2}):(\d{2})$/)?.slice(1, 3).join(':') ?? null;
+    const machineTime = dateTime.match(/^\d{4}-\d{2}-\d{2}T([01]\d|2[0-3]):([0-5]\d)$/)?.slice(1, 3).join(':') ?? null;
     const visibleTime = visiblePublishTime(m[1].replace(/<[^>]*>/g, ''));
     if (!machineTime) {
-      failures.push(`${rel}: post card datetime should include date and visible publish time: ${dateTime}`);
+      failures.push(`${rel}: post card datetime should include date and valid visible publish time: ${dateTime}`);
     } else if (visibleTime && machineTime !== visibleTime.padStart(5, '0')) {
       failures.push(`${rel}: post card datetime ${dateTime} does not match visible time ${visibleTime}`);
     }
