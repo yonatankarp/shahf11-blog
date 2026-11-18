@@ -17,18 +17,18 @@
     "check": "npm run check:blog-assets && npm run check:gallery-assets && npm run check:post-pdfs && npm run build && npm run check:site-metadata"
   },
   "dependencies": {
-    "@astrojs/markdown-remark": "^7.3.6",
-    "@astrojs/sitemap": "^3.7.4",
+    "@astrojs/markdown-remark": "^7.3.9",
+    "@astrojs/sitemap": "^3.7.5",
     "@fontsource-variable/assistant": "^5.3.0",
     "@fontsource-variable/frank-ruhl-libre": "^5.3.0",
     "@fontsource/gveret-levin": "^5.3.0",
     "@fontsource/heebo": "^5.3.0",
-    "astro": "^7.4.7",
+    "astro": "^7.4.12",
     "js-yaml": "^5.5.0",
     "sharp": "^0.35.5",
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
-    "playwright": "^1.65.0"
+    "playwright": "^1.65.1"
   }
 }
